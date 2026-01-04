@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>GBL Runner — Mobile Security Quiz (A=Jump, B=No Action, C=Slide)</title>
+  <title>GBL Runner — Mobile Security (Lane Select)</title>
   <style>
     :root{
       --bg:#0b1220;
       --panel:#111a2e;
-      --panel2:#0f1730;
       --ink:#eaf0ff;
       --muted:#b9c6ff;
       --accent:#64b5ff;
       --good:#39d98a;
       --bad:#ff5c7a;
-      --warn:#ffd166;
-      --gateA:#7c5cff;
-      --gateB:#33d6ff;
-      --gateC:#ff7ad9;
+
+      --laneA:#7c5cff;
+      --laneB:#33d6ff;
+      --laneC:#ff7ad9;
+
       --shadow: 0 10px 30px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
@@ -30,28 +30,15 @@
       color:var(--ink);
       overflow:hidden;
     }
-    .wrap{
-      height:100dvh;
-      display:flex;
-      flex-direction:column;
-    }
+    .wrap{height:100dvh; display:flex; flex-direction:column;}
     header{
       padding:12px 14px 10px;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
+      display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
     }
-    .brand{
-      display:flex; flex-direction:column; gap:2px;
-      min-width: 220px;
-    }
-    .brand .t{font-weight:700; letter-spacing:.2px}
+    .brand{display:flex; flex-direction:column; gap:2px; min-width: 260px;}
+    .brand .t{font-weight:800; letter-spacing:.2px}
     .brand .s{font-size:12px; color:var(--muted)}
-    .hud{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .hud{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
     .pill{
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
@@ -70,62 +57,34 @@
       border-radius:12px;
       padding:10px 12px;
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
       box-shadow: var(--shadow);
       transition: transform .05s ease;
       user-select:none;
     }
     .btn:active{transform: translateY(1px)}
-    main{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      padding:0 12px 12px;
-    }
-    .topRow{
-      display:flex;
-      gap:10px;
-      align-items:stretch;
-    }
+    main{flex:1; display:flex; flex-direction:column; gap:10px; padding:0 12px 12px;}
+    .topRow{display:flex; gap:10px; align-items:stretch;}
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
       border:1px solid rgba(255,255,255,.12);
       border-radius:18px;
       box-shadow: var(--shadow);
       padding:12px;
       backdrop-filter: blur(10px);
     }
-    .qCard{
-      flex: 1.1;
-      min-height:110px;
-      position:relative;
-      overflow:hidden;
-    }
-    .qTitle{
-      display:flex; justify-content:space-between; gap:8px; align-items:center;
-      margin-bottom:8px;
-    }
-    .qTitle .badge{
+    .qCard{flex: 1.2; min-height:130px; position:relative; overflow:hidden;}
+    .qTitle{display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;}
+    .badge{
       font-size:12px;
       padding:6px 10px;
       border-radius:999px;
       background: rgba(100,181,255,.16);
       border:1px solid rgba(100,181,255,.35);
-      color: var(--ink);
       white-space:nowrap;
     }
-    .qText{
-      font-size:16px;
-      line-height:1.25;
-      font-weight:750;
-    }
-    .choices{
-      margin-top:10px;
-      display:grid;
-      grid-template-columns:1fr;
-      gap:6px;
-    }
+    .qText{font-size:16px; line-height:1.28; font-weight:800;}
+    .choices{margin-top:10px; display:grid; grid-template-columns:1fr; gap:6px;}
     .choice{
       display:flex; gap:10px; align-items:center;
       padding:9px 10px;
@@ -135,35 +94,30 @@
       font-size:13px;
     }
     .tag{
-      width:28px; height:28px; border-radius:10px;
+      width:30px; height:30px; border-radius:10px;
       display:grid; place-items:center;
-      font-weight:900;
+      font-weight:950;
       color:#0b1220;
     }
-    .tag.A{background: var(--gateA)}
-    .tag.B{background: var(--gateB)}
-    .tag.C{background: var(--gateC)}
+    .tag.A{background: var(--laneA)}
+    .tag.B{background: var(--laneB)}
+    .tag.C{background: var(--laneC)}
     .muted{color:var(--muted)}
-    .gameCard{
-      flex: 1.9;
-      padding:10px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
+    .gameCard{flex: 1.8; padding:10px; display:flex; flex-direction:column; gap:10px;}
     canvas{
       width:100%;
       height: min(54dvh, 520px);
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.08));
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.10));
       box-shadow: var(--shadow);
-      touch-action: none;
+      touch-action:none;
     }
     .controls{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap:10px;
+      align-items:stretch;
     }
     .ctl{
       border-radius:16px;
@@ -174,21 +128,16 @@
       user-select:none;
       display:flex; flex-direction:column; gap:4px;
       align-items:center;
-      font-weight:900;
-    }
-    .ctl small{
-      font-weight:650; color:var(--muted);
+      font-weight:950;
       text-align:center;
-      line-height:1.2;
     }
-    .ctl.jump{outline:2px solid rgba(124,92,255,.25)}
-    .ctl.slide{outline:2px solid rgba(255,122,217,.22)}
-    .ctl.neutral{outline:2px solid rgba(51,214,255,.22)}
-    .footerRow{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
-      padding:2px 2px 0;
-    }
+    .ctl small{font-weight:700; color:var(--muted); line-height:1.2;}
+    .ctl.up{outline:2px solid rgba(124,92,255,.22)}
+    .ctl.mid{outline:2px solid rgba(51,214,255,.22)}
+    .ctl.down{outline:2px solid rgba(255,122,217,.20)}
+    .footerRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; padding:2px 2px 0;}
     .tiny{font-size:12px; color:var(--muted)}
+
     .overlay{
       position:fixed; inset:0;
       display:none;
@@ -199,7 +148,7 @@
       z-index: 50;
     }
     .modal{
-      width:min(720px, 96vw);
+      width:min(780px, 96vw);
       background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
       border:1px solid rgba(255,255,255,.14);
       border-radius:22px;
@@ -208,28 +157,27 @@
     }
     .modal h2{margin:6px 0 8px}
     .modal p, .modal li{color:var(--muted)}
-    .modal .row{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px;
-    }
+    .modal .row{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px;}
+
     .pop{
       position:absolute;
-      left:50%; top:50%;
+      left:50%; top:54%;
       transform: translate(-50%,-50%);
       padding:12px 14px;
       border-radius:18px;
       font-weight:950;
-      letter-spacing:.2px;
       display:none;
       z-index: 5;
       border:1px solid rgba(255,255,255,.14);
       box-shadow: var(--shadow);
       backdrop-filter: blur(8px);
       text-align:center;
-      min-width: 220px;
+      min-width: 260px;
     }
-    .pop.good{background: rgba(57,217,138,.20); color: var(--ink)}
-    .pop.bad{background: rgba(255,92,122,.18); color: var(--ink)}
-    .pop .why{display:block; margin-top:6px; font-size:12px; color:var(--muted); font-weight:650}
+    .pop.good{background: rgba(57,217,138,.20);}
+    .pop.bad{background: rgba(255,92,122,.18);}
+    .pop .why{display:block; margin-top:6px; font-size:12px; color:var(--muted); font-weight:700}
+
     @media (max-width: 900px){
       .topRow{flex-direction:column}
       canvas{height: min(52dvh, 440px);}
@@ -241,7 +189,7 @@
   <header>
     <div class="brand">
       <div class="t">GBL Runner — Mobile Security</div>
-      <div class="s">A = Jump • B = Do nothing • C = Slide (mobile buttons + keyboard)</div>
+      <div class="s">Pick a lane: A (top) • B (middle) • C (bottom). Keys: ↑/↓ or W/S or A/D</div>
     </div>
     <div class="hud">
       <div class="pill">Score: <b id="score">0</b></div>
@@ -256,8 +204,10 @@
     <div class="topRow">
       <section class="card qCard" aria-live="polite">
         <div class="qTitle">
-          <div class="badge" id="topicBadge">Topic</div>
-          <div class="tiny muted">Tip: If you do nothing, option <b>B</b> is selected automatically.</div>
+          <div class="badge" id="topicBadge">Ready</div>
+          <div class="tiny muted" id="hint">
+            Move lane and choose A/B/C. Gates start after a short reading delay.
+          </div>
         </div>
         <div class="qText" id="qText">Press Start to begin.</div>
         <div class="choices" id="choices"></div>
@@ -268,24 +218,19 @@
         <canvas id="c"></canvas>
 
         <div class="controls">
-          <div class="ctl jump" id="jumpBtn" role="button" tabindex="0">
-            JUMP (A)
-            <small>Tap / Space / ↑</small>
+          <div class="ctl up" id="laneUp" role="button" tabindex="0">▲ Lane Up
+            <small>Top = A</small>
           </div>
-          <div class="ctl neutral" id="waitBtn" role="button" tabindex="0">
-            WAIT (B)
-            <small>Auto if no action</small>
+          <div class="ctl mid" id="confirm" role="button" tabindex="0">Confirm
+            <small>Enter / Space</small>
           </div>
-          <div class="ctl slide" id="slideBtn" role="button" tabindex="0">
-            SLIDE (C)
-            <small>Tap / ↓</small>
+          <div class="ctl down" id="laneDown" role="button" tabindex="0">▼ Lane Down
+            <small>Bottom = C</small>
           </div>
         </div>
 
         <div class="footerRow">
-          <div class="tiny">
-            Data: stored locally • End screen lets you download CSV.
-          </div>
+          <div class="tiny">Data stored locally • End screen allows CSV download</div>
           <button class="btn" id="startBtn">Start</button>
         </div>
       </section>
@@ -298,16 +243,11 @@
     <h2 id="modalTitle">How to Play</h2>
     <div id="modalBody">
       <ul>
-        <li>You will see one question at the top with <b>three options (A/B/C)</b>.</li>
-        <li>The runner will approach three “answer gates”.</li>
-        <li>Select your answer using:</li>
-        <ul>
-          <li><b>Jump = A</b> (Space or ↑)</li>
-          <li><b>Do nothing = B</b> (auto selected if you take no action)</li>
-          <li><b>Slide = C</b> (↓)</li>
-        </ul>
-        <li>You get instant feedback and continue to the next question.</li>
-        <li>At the end, download your CSV attempt log.</li>
+        <li>Each question has three options (A/B/C) mapped to three lanes.</li>
+        <li><b>Top lane = A</b>, <b>Middle lane = B</b>, <b>Bottom lane = C</b>.</li>
+        <li>Use <b>↑/↓</b> (or <b>W/S</b> or <b>A/D</b>) to change lane.</li>
+        <li>Gates start moving after a short reading delay. Your current lane is your answer.</li>
+        <li>You may also press <b>Enter/Space</b> to lock your answer early.</li>
       </ul>
     </div>
     <div class="row">
@@ -318,220 +258,62 @@
 
 <script>
 /* =========================
-   QUESTION BANK (A/B/C)
-   Derived from attached chapters on Smartphone, Android, iOS security:
-   - Android Security
-   - iOS Security
-   - Use your smartphone as securely as possible
+   TUNING (slow + readable)
    ========================= */
+const READ_DELAY_MS = 2200;   // time before gates move (reading time)
+const GATE_SPEED    = 3.1;    // gate movement speed (lower = slower)
 
+/* =========================
+   QUESTION BANK (A/B/C)
+   ========================= */
 const QUESTION_BANK = [
-  // Android Security settings
-  {
-    id:"AS01", topic:"Android: Access control",
-    q:"Why enable SIM card lock on Android?",
-    A:"To require a PIN before the SIM works after power-on",
-    B:"To boost Wi-Fi speed",
-    C:"To auto-install updates",
-    correct:"A",
-    why:"SIM lock prevents calls/SIM use without the PIN after restart."
-  },
-  {
-    id:"AS02", topic:"Android: Screen lock",
-    q:"Which screen lock is recommended in the chapter for stronger security?",
-    A:"PIN or Password",
-    B:"No lock for convenience",
-    C:"Wallpaper lock",
-    correct:"A",
-    why:"PIN/password can be longer; pattern length is limited."
-  },
-  {
-    id:"AS03", topic:"Android: Encryption",
-    q:"On Android 4.0+ what security feature should be turned on?",
-    A:"Device encryption",
-    B:"Always-on NFC",
-    C:"Auto caller ID hide",
-    correct:"A",
-    why:"Device encryption protects stored data if the phone is lost."
-  },
-  {
-    id:"AS04", topic:"Android: Network hygiene",
-    q:"What should you turn off by default when not in use?",
-    A:"Wi-Fi and Bluetooth",
-    B:"Screen brightness only",
-    C:"Alarm clock",
-    correct:"A",
-    why:"Disabling radios reduces exposure and tracking surface."
-  },
-  {
-    id:"AS05", topic:"Android: Hotspot",
-    q:"Where do you switch off tethering / portable hotspot when not needed?",
-    A:"Wireless & Networks → More → Tethering & Mobile hotspot",
-    B:"Display → Wallpapers",
-    C:"Contacts → Import/Export",
-    correct:"A",
-    why:"Hotspot should be off when not in use to reduce risk."
-  },
-  {
-    id:"AS06", topic:"Android: NFC",
-    q:"If NFC is on by default, what is the safer practice?",
-    A:"Switch it off manually when not needed",
-    B:"Keep it on permanently",
-    C:"Turn off screen lock",
-    correct:"A",
-    why:"NFC should not run by default unless required."
-  },
-  {
-    id:"AS07", topic:"Android: Location",
-    q:"Best practice for GPS/Wireless location services is:",
-    A:"Enable only when needed",
-    B:"Always keep on in background",
-    C:"Disable updates forever",
-    correct:"A",
-    why:"Turning on only when needed reduces tracking and saves battery."
-  },
-  {
-    id:"AS08", topic:"Android: Updates",
-    q:"Two updates you should regularly check are:",
-    A:"OS updates and installed app updates",
-    B:"Wallpaper packs and ringtones only",
-    C:"Clock style and font updates only",
-    correct:"A",
-    why:"Keeping OS and apps updated reduces known vulnerabilities."
-  },
-
-  // Smartphone security general guide
-  {
-    id:"SS01", topic:"Smartphones: App install",
-    q:"Safest general place to install apps from is:",
-    A:"Official app stores (Play Store / App Store)",
-    B:"Random APK download sites",
-    C:"Unknown links in messages",
-    correct:"A",
-    why:"Official stores have limited review and lower malware risk."
-  },
-  {
-    id:"SS02", topic:"Smartphones: Unknown apps",
-    q:"Installing APKs from outside the store is risky mainly because:",
-    A:"They may contain malware",
-    B:"They always improve privacy",
-    C:"They reduce encryption strength",
-    correct:"A",
-    why:"Unofficial sources can distribute malicious apps."
-  },
-  {
-    id:"SS03", topic:"Smartphones: Permissions",
-    q:"What should you do if an app requests permissions that don’t make sense?",
-    A:"Be suspicious; consider declining/uninstalling",
-    B:"Always accept to continue",
-    C:"Disable the screen lock",
-    correct:"A",
-    why:"Unnecessary permissions can indicate data harvesting."
-  },
-  {
-    id:"SS04", topic:"Smartphones: Updates",
-    q:"Why uninstall apps you no longer use?",
-    A:"Apps can change owners and push risky updates later",
-    B:"It makes SMS encrypted",
-    C:"It disables GPS permanently",
-    correct:"A",
-    why:"Ownership changes can introduce malicious updates."
-  },
-  {
-    id:"SS05", topic:"Smartphones: Encryption reality",
-    q:"Encryption protects data best when the phone is:",
-    A:"Powered down or freshly rebooted and not unlocked",
-    B:"Unlocked and in use",
-    C:"On speakerphone during calls",
-    correct:"A",
-    why:"Unlocked devices can expose data despite encryption."
-  },
-  {
-    id:"SS06", topic:"Mobile networks",
-    q:"SMS text messages are generally:",
-    A:"Sent unencrypted",
-    B:"Always end-to-end encrypted by default",
-    C:"Encrypted only by screen brightness",
-    correct:"A",
-    why:"SMS is vulnerable to surveillance on mobile networks."
-  },
-  {
-    id:"SS07", topic:"Mobile threats",
-    q:"An IMSI catcher can be used to:",
-    A:"Pretend to be a cell tower to intercept/track",
-    B:"Improve battery health",
-    C:"Encrypt iCloud backups",
-    correct:"A",
-    why:"IMSI catchers can trick phones into connecting to them."
-  },
-  {
-    id:"SS08", topic:"Secure messaging",
-    q:"Which app is highlighted as an easy secure messaging option?",
-    A:"Signal",
-    B:"Any SMS app",
-    C:"Caller ID hide feature",
-    correct:"A",
-    why:"Signal supports encrypted messages and calls over the internet."
-  },
-  {
-    id:"SS09", topic:"Wi-Fi safety",
-    q:"A general best practice when not using radios is to:",
-    A:"Disable Wi-Fi, Bluetooth, and NFC",
-    B:"Share your screen lock with friends",
-    C:"Keep hotspot on always",
-    correct:"A",
-    why:"Disabling radios reduces accidental exposure and attack surface."
-  },
-
-  // iOS Security
-  {
-    id:"IOS01", topic:"iOS: Encryption",
-    q:"On iOS, tying encryption to your data requires you to set a:",
-    A:"Passcode / passphrase",
-    B:"Wallpaper",
-    C:"Ringtone",
-    correct:"A",
-    why:"Passcode enables data protection by tying it to encryption."
-  },
-  {
-    id:"IOS02", topic:"iOS: Passcode strength",
-    q:"The guide suggests a passcode that is ideally:",
-    A:"Alphanumeric and longer than 6 characters",
-    B:"Always 4 digits",
-    C:"No passcode if FaceID exists",
-    correct:"A",
-    why:"Longer alphanumeric codes are harder to crack."
-  },
-  {
-    id:"IOS03", topic:"iOS: Backup",
-    q:"In iTunes, what option encrypts backups on your computer?",
-    A:"“Encrypt backup”",
-    B:"“Fast sync”",
-    C:"“Share analytics”",
-    correct:"A",
-    why:"iTunes backups are not encrypted by default without this option."
-  },
-  {
-    id:"IOS04", topic:"iOS: Device wipe",
-    q:"A safety feature you can enable is to erase data after:",
-    A:"10 failed passcode attempts",
-    B:"10 minutes of no Wi-Fi",
-    C:"10 missed calls",
-    correct:"A",
-    why:"This can protect data if the device is attacked physically."
-  },
-  {
-    id:"IOS05", topic:"iOS: Find My iPhone trade-off",
-    q:"Remote erase via Find My iPhone can also allow Apple to:",
-    A:"Request the location of your device",
-    B:"Disable all encryption permanently",
-    C:"Stop OS updates forever",
-    correct:"A",
-    why:"Remote features involve a location privacy trade-off."
-  }
+  {id:"AS01",topic:"Android: Access control",q:"Why enable SIM card lock on Android?",
+   A:"To require a PIN before the SIM works after power-on",B:"To boost Wi-Fi speed",C:"To auto-install updates",correct:"A",
+   why:"SIM lock prevents SIM use without the PIN after restart."},
+  {id:"AS02",topic:"Android: Screen lock",q:"Which screen lock is recommended for stronger security?",
+   A:"PIN or Password",B:"No lock for convenience",C:"Wallpaper lock",correct:"A",
+   why:"PIN/password can be stronger and longer than patterns."},
+  {id:"AS03",topic:"Android: Encryption",q:"On Android 4.0+ what security feature should be turned on?",
+   A:"Device encryption",B:"Always-on NFC",C:"Auto caller ID hide",correct:"A",
+   why:"Encryption protects stored data if the phone is lost."},
+  {id:"AS04",topic:"Android: Network hygiene",q:"What should you turn off by default when not in use?",
+   A:"Wi-Fi and Bluetooth",B:"Screen brightness only",C:"Alarm clock",correct:"A",
+   why:"Disabling radios reduces exposure and attack surface."},
+  {id:"AS05",topic:"Android: NFC",q:"If NFC is on by default, what is the safer practice?",
+   A:"Switch it off manually when not needed",B:"Keep it on permanently",C:"Turn off screen lock",correct:"A",
+   why:"NFC should not run by default unless required."},
+  {id:"SS01",topic:"Smartphones: App install",q:"Safest general place to install apps from is:",
+   A:"Official app stores",B:"Random APK sites",C:"Unknown links in messages",correct:"A",
+   why:"Official stores reduce (not remove) malware risk."},
+  {id:"SS03",topic:"Smartphones: Permissions",q:"If an app requests unnecessary permissions, you should:",
+   A:"Be suspicious; consider declining/uninstalling",B:"Always accept to continue",C:"Disable screen lock",correct:"A",
+   why:"Unnecessary permissions can indicate data harvesting."},
+  {id:"SS06",topic:"Mobile networks",q:"SMS text messages are generally:",
+   A:"Sent unencrypted",B:"End-to-end encrypted by default",C:"Encrypted by screen lock",correct:"A",
+   why:"SMS is often vulnerable to interception on networks."},
+  {id:"SS08",topic:"Secure messaging",q:"Which app is widely used for secure messaging with encryption?",
+   A:"Signal",B:"Any SMS app",C:"Caller ID hide feature",correct:"A",
+   why:"Signal provides encrypted messages and calls."},
+  {id:"IOS01",topic:"iOS: Encryption",q:"On iOS, tying encryption to your data requires you to set a:",
+   A:"Passcode / passphrase",B:"Wallpaper",C:"Ringtone",correct:"A",
+   why:"Passcode enables data protection mechanisms."},
+  {id:"IOS03",topic:"iOS: Backup",q:"In iTunes, which option encrypts backups on your computer?",
+   A:"Encrypt backup",B:"Fast sync",C:"Share analytics",correct:"A",
+   why:"Backups are not encrypted by default unless enabled."},
+  {id:"IOS04",topic:"iOS: Device wipe",q:"A safety feature can erase data after:",
+   A:"10 failed passcode attempts",B:"10 minutes of no Wi-Fi",C:"10 missed calls",correct:"A",
+   why:"This can protect data during physical attack attempts."},
+  {id:"SS07",topic:"Mobile threats",q:"An IMSI catcher can be used to:",
+   A:"Pretend to be a cell tower to intercept/track",B:"Improve battery health",C:"Encrypt backups",correct:"A",
+   why:"It can trick phones into connecting to it."},
+  {id:"SS05",topic:"Encryption reality",q:"Encryption protects data best when the phone is:",
+   A:"Powered down/rebooted and not unlocked",B:"Unlocked and in use",C:"On speakerphone",correct:"A",
+   why:"Unlocked devices can expose data despite encryption."},
+  {id:"AS08",topic:"Android: Updates",q:"Two updates you should regularly check are:",
+   A:"OS updates and installed app updates",B:"Wallpaper packs only",C:"Font updates only",correct:"A",
+   why:"Updates patch known vulnerabilities."},
 ];
 
-// Shuffle helper (stable enough for gameplay)
 function shuffle(arr){
   const a = arr.slice();
   for(let i=a.length-1;i>0;i--){
@@ -541,9 +323,6 @@ function shuffle(arr){
   return a;
 }
 
-/* =========================
-   GAME STATE
-   ========================= */
 const state = {
   running:false,
   idx:0,
@@ -552,15 +331,13 @@ const state = {
   correct:0,
   attempted:0,
   current:null,
-  selection:"B",          // default = B if no action
-  windowOpen:false,
-  windowStart:0,
-  windowMs: 2400,         // decision window (ms)
+  lane:1,             // 0=A (top), 1=B (mid), 2=C (bottom)
+  locked:false,        // confirm lock
   popUntil:0,
   log:[]
 };
 
-// UI elements
+// UI
 const scoreEl = document.getElementById("score");
 const accEl   = document.getElementById("acc");
 const qnumEl  = document.getElementById("qnum");
@@ -571,48 +348,11 @@ const topicBadge = document.getElementById("topicBadge");
 const popupEl = document.getElementById("popup");
 const overlay = document.getElementById("overlay");
 
-const howBtn = document.getElementById("howBtn");
-const restartBtn = document.getElementById("restartBtn");
-const startBtn = document.getElementById("startBtn");
-
-const jumpBtn = document.getElementById("jumpBtn");
-const waitBtn = document.getElementById("waitBtn");
-const slideBtn= document.getElementById("slideBtn");
-
 document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
-howBtn.onclick = ()=> overlay.style.display="flex";
+document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
+document.getElementById("restartBtn").onclick = ()=> boot();
+document.getElementById("startBtn").onclick = ()=> { if(!state.running) startGame(); };
 
-restartBtn.onclick = ()=> boot(true);
-startBtn.onclick = ()=> {
-  if(!state.running) startGame();
-};
-
-// Touch/click controls
-function pressJump(){ if(state.windowOpen) state.selection="A"; flashCtl(); }
-function pressSlide(){ if(state.windowOpen) state.selection="C"; flashCtl(); }
-function pressWait(){ if(state.windowOpen) state.selection="B"; flashCtl(); }
-
-jumpBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); pressJump(); });
-slideBtn.addEventListener("pointerdown",(e)=>{ e.preventDefault(); pressSlide(); });
-waitBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); pressWait(); });
-
-// Keyboard controls
-window.addEventListener("keydown",(e)=>{
-  if(!state.running) return;
-  if(!state.windowOpen) return;
-  if(e.code==="Space" || e.code==="ArrowUp") { e.preventDefault(); pressJump(); }
-  if(e.code==="ArrowDown") { e.preventDefault(); pressSlide(); }
-});
-
-// Minimal visual feedback on button press
-function flashCtl(){
-  [jumpBtn,waitBtn,slideBtn].forEach(el=> el.style.filter="brightness(1)");
-  const map = {A:jumpBtn,B:waitBtn,C:slideBtn};
-  map[state.selection].style.filter="brightness(1.25)";
-  setTimeout(()=>{ [jumpBtn,waitBtn,slideBtn].forEach(el=> el.style.filter="brightness(1)"); },120);
-}
-
-// Update HUD
 function updateHUD(){
   scoreEl.textContent = String(state.score);
   const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
@@ -621,7 +361,6 @@ function updateHUD(){
   qtotalEl.textContent = String(state.questions.length);
 }
 
-// Render question card
 function renderQuestion(q){
   state.current = q;
   topicBadge.textContent = q.topic;
@@ -635,24 +374,9 @@ function renderQuestion(q){
   choicesEl.innerHTML = rows.map(r => `
     <div class="choice">
       <div class="tag ${r.cls}">${r.k}</div>
-      <div><b>${r.txt}</b></div>
+      <div><b>${escapeHtml(r.txt)}</b></div>
     </div>
   `).join("");
-}
-
-// Popup feedback
-function showPopup(ok, correctKey, why){
-  popupEl.className = "pop " + (ok ? "good" : "bad");
-  popupEl.style.display = "block";
-  popupEl.innerHTML = (ok ? "✅ Correct!" : "❌ Wrong!") +
-    `<span class="why">Correct: ${correctKey}. ${escapeHtml(why)}</span>`;
-  state.popUntil = performance.now() + 900;
-}
-
-function hidePopupIfNeeded(now){
-  if(popupEl.style.display==="block" && now > state.popUntil){
-    popupEl.style.display="none";
-  }
 }
 
 function escapeHtml(s){
@@ -661,13 +385,30 @@ function escapeHtml(s){
   }[m]));
 }
 
+function laneToKey(lane){
+  return lane===0 ? "A" : lane===1 ? "B" : "C";
+}
+
+function showPopup(ok, correctKey, why){
+  popupEl.className = "pop " + (ok ? "good" : "bad");
+  popupEl.style.display = "block";
+  popupEl.innerHTML = (ok ? "✅ Correct!" : "❌ Wrong!") +
+    `<span class="why">Correct: ${correctKey}. ${escapeHtml(why)}</span>`;
+  state.popUntil = performance.now() + 950;
+}
+
+function hidePopupIfNeeded(now){
+  if(popupEl.style.display==="block" && now > state.popUntil){
+    popupEl.style.display="none";
+  }
+}
+
 /* =========================
-   CANVAS RUNNER
+   CANVAS VISUALS (better runner + lanes)
    ========================= */
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
 
-// Handle HiDPI
 function fitCanvas(){
   const rect = canvas.getBoundingClientRect();
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -677,46 +418,41 @@ function fitCanvas(){
 }
 window.addEventListener("resize", fitCanvas);
 
-// Scene objects
 const scene = {
-  t:0,
-  groundY:0,
-  laneY:[],           // three lanes
-  runner:{ x:90, y:0, w:34, h:40, pose:"run" },
   scroll:0,
   stars:[],
-  gates:null,         // {x, w, yA,yB,yC, h, active}
+  laneY:[],
+  runner:{ x:95, y:0, w:44, h:54, legPhase:0 },
+  gates:null,
+  phase:"idle",     // "idle" | "reading" | "moving"
+  phaseStart:0,
   shakeUntil:0
 };
 
 function initScene(){
   fitCanvas();
   const rect = canvas.getBoundingClientRect();
-  const w = rect.width;
-  const h = rect.height;
+  const w = rect.width, h = rect.height;
 
-  scene.groundY = h * 0.80;
-  scene.laneY = [
-    h*0.30,  // A upper
-    h*0.52,  // B middle
-    h*0.68   // C lower
-  ];
-  scene.runner.y = scene.laneY[1];
-  scene.scroll = 0;
+  scene.laneY = [h*0.28, h*0.50, h*0.72];
+  scene.runner.y = scene.laneY[state.lane];
+
   scene.stars = [];
-  for(let i=0;i<60;i++){
+  for(let i=0;i<70;i++){
     scene.stars.push({
       x: Math.random()*w,
       y: Math.random()*h*0.6,
-      r: 0.6 + Math.random()*1.4,
-      s: 0.2 + Math.random()*0.8
+      r: 0.6 + Math.random()*1.7,
+      s: 0.2 + Math.random()*0.9
     });
   }
+
   scene.gates = null;
+  scene.phase = "idle";
+  scene.phaseStart = performance.now();
   scene.shakeUntil = 0;
 }
 
-// Draw helper shapes
 function roundRect(x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y);
@@ -727,175 +463,223 @@ function roundRect(x,y,w,h,r){
   ctx.closePath();
 }
 
-function draw(now){
-  const rect = canvas.getBoundingClientRect();
-  const w = rect.width, h = rect.height;
+function getCss(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 
-  // tiny shake on wrong
-  let shakeX = 0;
-  if(now < scene.shakeUntil){
-    shakeX = (Math.random()*2-1) * 2.0;
+function drawRunner(now){
+  const r = scene.runner;
+  const w = r.w, h = r.h;
+  const x = r.x, y = r.y;
+
+  // smooth lane follow
+  const targetY = scene.laneY[state.lane];
+  r.y += (targetY - r.y) * 0.18;
+
+  // step animation
+  r.legPhase += (scene.phase==="moving" ? 0.22 : 0.08);
+
+  // shadow
+  ctx.fillStyle = "rgba(0,0,0,.35)";
+  ctx.beginPath();
+  ctx.ellipse(x+18, r.y + h/2 + 30, 20, 7, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // outer suit
+  const suitGrad = ctx.createLinearGradient(x, y-h/2, x+w, y+h/2);
+  suitGrad.addColorStop(0, "rgba(255,255,255,.92)");
+  suitGrad.addColorStop(1, "rgba(200,220,255,.80)");
+  ctx.fillStyle = suitGrad;
+  roundRect(x, r.y-h/2, w, h, 16);
+  ctx.fill();
+
+  // suit outline
+  ctx.strokeStyle = "rgba(100,181,255,.35)";
+  ctx.lineWidth = 2;
+  roundRect(x, r.y-h/2, w, h, 16);
+  ctx.stroke();
+
+  // helmet visor
+  const visor = ctx.createLinearGradient(x+6, r.y-h/2+10, x+w-6, r.y-h/2+24);
+  visor.addColorStop(0, "rgba(100,181,255,.75)");
+  visor.addColorStop(1, "rgba(124,92,255,.55)");
+  ctx.fillStyle = visor;
+  roundRect(x+7, r.y-h/2+10, w-14, 14, 9);
+  ctx.fill();
+
+  // glow stripe
+  ctx.fillStyle = "rgba(255,255,255,.22)";
+  roundRect(x+10, r.y-h/2+30, w-20, 8, 6);
+  ctx.fill();
+
+  // legs
+  const step = Math.sin(r.legPhase) * 7;
+  ctx.strokeStyle = "rgba(255,255,255,.88)";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(x+14, r.y+h/2-4); ctx.lineTo(x+14+step, r.y+h/2+14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w-14, r.y+h/2-4); ctx.lineTo(x+w-14-step, r.y+h/2+14); ctx.stroke();
+
+  // small jet sparkle (just visual, not violent)
+  if(scene.phase==="moving" && (Math.sin(now/70) > 0.65)){
+    ctx.fillStyle = "rgba(255,209,102,.70)";
+    ctx.beginPath(); ctx.arc(x-6, r.y+8, 4, 0, Math.PI*2); ctx.fill();
   }
+}
+
+function drawScene(now){
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+
+  let shakeX = 0;
+  if(now < scene.shakeUntil) shakeX = (Math.random()*2-1) * 2.0;
 
   ctx.save();
   ctx.translate(shakeX, 0);
 
-  // sky
-  ctx.clearRect(0,0,w,h);
-  // stars
-  ctx.globalAlpha = 0.9;
-  ctx.fillStyle = "rgba(255,255,255,.75)";
+  ctx.clearRect(0,0,W,H);
+
+  // starfield
+  ctx.fillStyle = "rgba(255,255,255,.80)";
   for(const st of scene.stars){
-    const x = (st.x - scene.scroll*st.s*0.4 + w) % w;
+    const x = (st.x - scene.scroll*st.s*0.35 + W) % W;
     ctx.beginPath();
     ctx.arc(x, st.y, st.r, 0, Math.PI*2);
     ctx.fill();
   }
-  ctx.globalAlpha = 1;
-
-  // horizon glow
-  const grad = ctx.createLinearGradient(0,0,0,h);
-  grad.addColorStop(0,"rgba(100,181,255,.15)");
-  grad.addColorStop(0.55,"rgba(0,0,0,0)");
-  grad.addColorStop(1,"rgba(0,0,0,.25)");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0,0,w,h);
-
-  // ground
-  ctx.fillStyle = "rgba(255,255,255,.06)";
-  ctx.fillRect(0, scene.groundY, w, h - scene.groundY);
 
   // lane guides
   ctx.strokeStyle = "rgba(255,255,255,.10)";
   ctx.lineWidth = 2;
-  for(const y of scene.laneY){
+  for(let i=0;i<3;i++){
     ctx.beginPath();
-    ctx.moveTo(0,y);
-    ctx.lineTo(w,y);
+    ctx.moveTo(0, scene.laneY[i]);
+    ctx.lineTo(W, scene.laneY[i]);
     ctx.stroke();
   }
 
-  // moving stripes on ground
-  scene.scroll += 2.4;
-  ctx.strokeStyle = "rgba(255,255,255,.12)";
+  // current lane highlight
+  const laneColor = state.lane===0 ? getCss("--laneA") : state.lane===1 ? getCss("--laneB") : getCss("--laneC");
+  ctx.fillStyle = laneColor;
+  ctx.globalAlpha = 0.12;
+  ctx.fillRect(0, scene.laneY[state.lane]-40, W, 80);
+  ctx.globalAlpha = 1;
+
+  // ground strip
+  const groundY = H*0.84;
+  ctx.fillStyle = "rgba(255,255,255,.06)";
+  ctx.fillRect(0, groundY, W, H-groundY);
+
+  // moving floor dashes
+  scene.scroll += (scene.phase==="moving" ? 2.0 : 0.7);
+  ctx.strokeStyle = "rgba(255,255,255,.14)";
   ctx.lineWidth = 6;
-  for(let x=-(scene.scroll%80); x<w; x+=80){
+  for(let x=-(scene.scroll%90); x<W; x+=90){
     ctx.beginPath();
-    ctx.moveTo(x, scene.groundY+28);
-    ctx.lineTo(x+34, scene.groundY+28);
+    ctx.moveTo(x, groundY+24);
+    ctx.lineTo(x+38, groundY+24);
     ctx.stroke();
   }
 
   // gates
   if(scene.gates){
     const g = scene.gates;
-    // gate columns (A/B/C)
-    const gateW = g.w;
-    const gateH = g.h;
-
     const cols = [
-      {k:"A", y:g.yA, color:getCss("--gateA")},
-      {k:"B", y:g.yB, color:getCss("--gateB")},
-      {k:"C", y:g.yC, color:getCss("--gateC")},
+      {k:"A", y: scene.laneY[0], color:getCss("--laneA")},
+      {k:"B", y: scene.laneY[1], color:getCss("--laneB")},
+      {k:"C", y: scene.laneY[2], color:getCss("--laneC")},
     ];
-
     for(const c of cols){
-      // body
       ctx.fillStyle = c.color;
-      ctx.globalAlpha = 0.82;
-      roundRect(g.x, c.y-gateH/2, gateW, gateH, 14);
+      ctx.globalAlpha = 0.86;
+      roundRect(g.x, c.y - g.h/2, g.w, g.h, 16);
       ctx.fill();
       ctx.globalAlpha = 1;
 
       // label
-      ctx.fillStyle = "rgba(11,18,32,.95)";
-      ctx.font = "900 20px system-ui,Segoe UI,Arial";
-      ctx.fillText(c.k, g.x + gateW/2 - 6, c.y+7);
+      ctx.fillStyle = "rgba(11,18,32,.92)";
+      ctx.font = "950 22px system-ui,Segoe UI,Arial";
+      ctx.fillText(c.k, g.x + g.w/2 - 7, c.y + 8);
 
-      // small subtitle
-      ctx.fillStyle = "rgba(11,18,32,.75)";
-      ctx.font = "700 12px system-ui,Segoe UI,Arial";
-      ctx.fillText("Option", g.x + 10, c.y + gateH/2 - 10);
+      // tiny "Option"
+      ctx.fillStyle = "rgba(11,18,32,.70)";
+      ctx.font = "800 12px system-ui,Segoe UI,Arial";
+      ctx.fillText("Option", g.x + 10, c.y + g.h/2 - 10);
     }
   }
 
-  // runner (simple character)
-  const r = scene.runner;
-  // shadow
-  ctx.fillStyle = "rgba(0,0,0,.35)";
-  ctx.beginPath();
-  ctx.ellipse(r.x+12, r.y + r.h/2 + 28, 18, 7, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // body
-  ctx.fillStyle = "rgba(255,255,255,.88)";
-  roundRect(r.x, r.y-r.h/2, r.w, r.h, 10);
-  ctx.fill();
-
-  // visor stripe
-  ctx.fillStyle = "rgba(100,181,255,.55)";
-  roundRect(r.x+6, r.y-r.h/2+8, r.w-12, 10, 6);
-  ctx.fill();
-
-  // legs (animate)
-  const step = Math.sin(now/90)*6;
-  ctx.strokeStyle = "rgba(255,255,255,.85)";
-  ctx.lineWidth = 5;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(r.x+10, r.y+r.h/2-4);
-  ctx.lineTo(r.x+10+step, r.y+r.h/2+14);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(r.x+r.w-10, r.y+r.h/2-4);
-  ctx.lineTo(r.x+r.w-10-step, r.y+r.h/2+14);
-  ctx.stroke();
+  // runner
+  drawRunner(now);
 
   ctx.restore();
 }
 
-function getCss(name){
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+/* =========================
+   INPUT (lane select)
+   ========================= */
+function laneUp(){
+  if(!state.running) return;
+  state.lane = Math.max(0, state.lane - 1);
 }
+function laneDown(){
+  if(!state.running) return;
+  state.lane = Math.min(2, state.lane + 1);
+}
+function confirmLock(){
+  if(!state.running) return;
+  state.locked = true;
+}
+
+document.getElementById("laneUp").addEventListener("pointerdown",(e)=>{ e.preventDefault(); laneUp(); });
+document.getElementById("laneDown").addEventListener("pointerdown",(e)=>{ e.preventDefault(); laneDown(); });
+document.getElementById("confirm").addEventListener("pointerdown",(e)=>{ e.preventDefault(); confirmLock(); });
+
+window.addEventListener("keydown",(e)=>{
+  if(!state.running) return;
+
+  // up/down
+  if(e.code==="ArrowUp" || e.code==="KeyW"){ e.preventDefault(); laneUp(); }
+  if(e.code==="ArrowDown" || e.code==="KeyS"){ e.preventDefault(); laneDown(); }
+
+  // alternative A/D to move (common for games)
+  if(e.code==="KeyA"){ e.preventDefault(); laneUp(); }
+  if(e.code==="KeyD"){ e.preventDefault(); laneDown(); }
+
+  // confirm
+  if(e.code==="Enter" || e.code==="Space"){ e.preventDefault(); confirmLock(); }
+});
 
 /* =========================
    GAME FLOW
    ========================= */
-function boot(hard=false){
-  // reset
+function boot(){
   state.running = false;
   state.idx = 0;
   state.score = 0;
   state.correct = 0;
   state.attempted = 0;
-  state.selection = "B";
-  state.windowOpen = false;
   state.current = null;
+  state.lane = 1;
+  state.locked = false;
   state.log = [];
   popupEl.style.display = "none";
 
-  // question list
-  // Use 15 questions per run (you can change to 10/20)
   const shuffled = shuffle(QUESTION_BANK);
   state.questions = shuffled.slice(0, Math.min(15, shuffled.length));
   qtotalEl.textContent = String(state.questions.length);
 
   updateHUD();
+  topicBadge.textContent = "Ready";
   qTextEl.textContent = "Press Start to begin.";
   choicesEl.innerHTML = "";
-  topicBadge.textContent = "Ready";
 
-  // canvas
   initScene();
-  if(hard){
-    // clear saved run in local storage if desired
-  }
 }
 
 function startGame(){
   state.running = true;
-  startBtn.textContent = "Running…";
-  startBtn.disabled = true;
+  document.getElementById("startBtn").textContent = "Running…";
+  document.getElementById("startBtn").disabled = true;
   nextQuestion();
 }
 
@@ -904,36 +688,30 @@ function nextQuestion(){
     endGame();
     return;
   }
+
   const q = state.questions[state.idx];
+  state.idx += 1;
+  state.locked = false;
+
   renderQuestion(q);
+  topicBadge.textContent = q.topic;
 
-  // open decision window
-  state.selection = "B"; // default
-  state.windowOpen = true;
-  state.windowStart = performance.now();
-
-  // spawn gates ahead
+  // Create gates but keep them paused first (reading phase)
   const rect = canvas.getBoundingClientRect();
-  const w = rect.width;
   scene.gates = {
-    x: w + 30,
-    w: Math.max(88, w*0.13),
-    h: Math.max(62, rect.height*0.16),
-    yA: scene.laneY[0],
-    yB: scene.laneY[1],
-    yC: scene.laneY[2],
-    active:true,
+    x: rect.width + 30,
+    w: Math.max(96, rect.width*0.14),
+    h: Math.max(72, rect.height*0.18),
     done:false
   };
-  // set runner to middle lane (visual only)
-  scene.runner.y = scene.laneY[1];
 
-  state.idx += 1;
+  scene.phase = "reading";
+  scene.phaseStart = performance.now();
 }
 
 function evaluate(){
   const q = state.current;
-  const selected = state.selection; // A/B/C
+  const selected = laneToKey(state.lane);
   const correct = q.correct;
   const ok = (selected === correct);
 
@@ -949,60 +727,44 @@ function evaluate(){
 
   // log
   const tNow = new Date().toISOString();
-  const rt = Math.max(0, Math.round(performance.now() - state.windowStart));
   state.log.push({
-    ts:tNow,
-    qid:q.id,
-    topic:q.topic,
-    question:q.q,
-    selected:selected,
-    correct:correct,
+    ts:tNow, qid:q.id, topic:q.topic,
+    selected, correct,
     is_correct: ok ? 1 : 0,
-    response_ms: rt,
-    score_after: state.score
+    score_after: state.score,
+    question: q.q
   });
-
-  // close window
-  state.windowOpen = false;
 }
 
 function endGame(){
   state.running = false;
+  const startBtn = document.getElementById("startBtn");
   startBtn.disabled = false;
   startBtn.textContent = "Start";
-  // show end modal
+
   const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
   document.getElementById("modalTitle").textContent = "Run Completed";
   document.getElementById("modalBody").innerHTML = `
     <p><b>Score:</b> ${state.score} &nbsp; | &nbsp; <b>Accuracy:</b> ${acc}% &nbsp; | &nbsp; <b>Attempted:</b> ${state.attempted}</p>
-    <p class="muted">You can download your attempt log as CSV for analysis.</p>
+    <p class="muted">Download your attempt log as CSV.</p>
     <div class="row" style="justify-content:flex-start; margin-top:10px; gap:10px;">
       <button class="btn" id="dlBtn">Download CSV</button>
-      <button class="btn" id="reviewBtn">Review Questions</button>
+      <button class="btn" id="reviewBtn">Review</button>
     </div>
     <div id="reviewArea" style="display:none; margin-top:12px;"></div>
   `;
   overlay.style.display = "flex";
 
   setTimeout(()=>{
-    const dlBtn = document.getElementById("dlBtn");
-    const reviewBtn = document.getElementById("reviewBtn");
-    const reviewArea = document.getElementById("reviewArea");
-
-    dlBtn.onclick = downloadCSV;
-
-    reviewBtn.onclick = ()=>{
-      reviewArea.style.display = (reviewArea.style.display==="none") ? "block" : "none";
-      if(reviewArea.innerHTML.trim()===""){
-        reviewArea.innerHTML = renderReviewHTML();
-      }
+    document.getElementById("dlBtn").onclick = downloadCSV;
+    document.getElementById("reviewBtn").onclick = ()=>{
+      const ra = document.getElementById("reviewArea");
+      ra.style.display = (ra.style.display==="none") ? "block" : "none";
+      if(ra.innerHTML.trim()==="") ra.innerHTML = renderReviewHTML();
     };
   },0);
 
-  // persist last run locally
-  try{
-    localStorage.setItem("GBL_RUNNER_LAST_LOG", JSON.stringify(state.log));
-  }catch(e){}
+  try{ localStorage.setItem("GBL_RUNNER_LAST_LOG", JSON.stringify(state.log)); }catch(e){}
 }
 
 function renderReviewHTML(){
@@ -1011,12 +773,12 @@ function renderReviewHTML(){
     const q = byId.get(r.qid);
     return `
       <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:16px; margin:8px 0; background:rgba(0,0,0,.10);">
-        <div style="font-weight:900">${escapeHtml(q.q)}</div>
+        <div style="font-weight:950">${escapeHtml(q.q)}</div>
         <div class="muted" style="margin-top:6px; font-size:13px">
           A: ${escapeHtml(q.A)}<br/>
           B: ${escapeHtml(q.B)}<br/>
           C: ${escapeHtml(q.C)}<br/>
-          <b>Correct:</b> ${q.correct} &nbsp; | &nbsp; <b>Your choice:</b> ${r.selected} &nbsp; | &nbsp;
+          <b>Correct:</b> ${q.correct} &nbsp; | &nbsp; <b>Your lane:</b> ${r.selected} &nbsp; | &nbsp;
           <b>${r.is_correct ? "Correct" : "Wrong"}</b>
           <br/><span class="muted">${escapeHtml(q.why)}</span>
         </div>
@@ -1027,24 +789,16 @@ function renderReviewHTML(){
 }
 
 function downloadCSV(){
-  const rows = [
-    ["ts","qid","topic","selected","correct","is_correct","response_ms","score_after","question"]
-  ];
+  const rows = [["ts","qid","topic","selected","correct","is_correct","score_after","question"]];
   for(const r of state.log){
-    rows.push([
-      r.ts, r.qid, r.topic, r.selected, r.correct, r.is_correct, r.response_ms, r.score_after,
-      r.question
-    ]);
+    rows.push([r.ts,r.qid,r.topic,r.selected,r.correct,r.is_correct,r.score_after,r.question]);
   }
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url;
-  a.download = "GBL_Runner_Log.csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.href = url; a.download = "GBL_Runner_Log.csv";
+  document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 }
 
@@ -1054,36 +808,41 @@ function downloadCSV(){
 function tick(now){
   hidePopupIfNeeded(now);
 
-  // move gates towards runner when decision window is open
-  if(state.running && scene.gates && scene.gates.active){
-    scene.gates.x -= 6.2; // constant speed
+  if(state.running && scene.gates){
+    if(scene.phase === "reading"){
+      // hold gates during reading time
+      if(now - scene.phaseStart >= READ_DELAY_MS){
+        scene.phase = "moving";
+        scene.phaseStart = now;
+      }
+    } else if(scene.phase === "moving"){
+      // move gates slowly (readable)
+      scene.gates.x -= GATE_SPEED;
 
-    // when gates reach runner x, evaluate (once)
-    const hitX = scene.runner.x + 40;
-    if(!scene.gates.done && scene.gates.x <= hitX){
-      scene.gates.done = true;
-      evaluate();
-    }
+      // allow early lock: if locked, slow down slightly (gives confidence)
+      if(state.locked) scene.gates.x -= 0.7;
 
-    // after passing, clear gates and load next question after short delay
-    if(scene.gates.x < -scene.gates.w - 40){
-      scene.gates = null;
-      // proceed after small pause
-      setTimeout(()=>{
-        if(state.running) nextQuestion();
-      }, 320);
+      // evaluate at collision point
+      const hitX = scene.runner.x + 54;
+      if(!scene.gates.done && scene.gates.x <= hitX){
+        scene.gates.done = true;
+        evaluate();
+      }
+
+      // after passing, clear and go next
+      if(scene.gates.x < -scene.gates.w - 50){
+        scene.gates = null;
+        scene.phase = "idle";
+        setTimeout(()=>{ if(state.running) nextQuestion(); }, 420);
+      }
     }
   }
 
-  // if time window expires before collision, keep selection B and let collision evaluate
-  // (collision will still happen; selection remains default)
-
-  draw(now);
+  drawScene(now);
   requestAnimationFrame(tick);
 }
 
-// Start
-boot(false);
+boot();
 requestAnimationFrame(tick);
 </script>
 </body>
