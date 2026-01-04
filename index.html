@@ -3,48 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>GBL Runner — Mobile Security (Lane Select)</title>
+  <title>GBL Mario-Style Platformer — Mobile Security Quiz</title>
   <style>
     :root{
       --bg:#0b1220;
-      --panel:#111a2e;
+      --panel:rgba(255,255,255,.08);
+      --border:rgba(255,255,255,.14);
       --ink:#eaf0ff;
       --muted:#b9c6ff;
-      --accent:#64b5ff;
       --good:#39d98a;
       --bad:#ff5c7a;
-
-      --laneA:#7c5cff;
-      --laneB:#33d6ff;
-      --laneC:#ff7ad9;
-
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --a:#7c5cff;
+      --b:#33d6ff;
+      --c:#ff7ad9;
+      --shadow:0 12px 34px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
+      margin:0; color:var(--ink);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 500px at 70% 10%, rgba(100,181,255,.18), transparent 55%),
-                  radial-gradient(900px 400px at 20% 20%, rgba(124,92,255,.14), transparent 60%),
-                  var(--bg);
-      color:var(--ink);
+      background:
+        radial-gradient(1000px 450px at 70% 10%, rgba(100,181,255,.18), transparent 55%),
+        radial-gradient(900px 420px at 20% 20%, rgba(124,92,255,.14), transparent 60%),
+        var(--bg);
       overflow:hidden;
     }
     .wrap{height:100dvh; display:flex; flex-direction:column;}
     header{
       padding:12px 14px 10px;
-      display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;
     }
-    .brand{display:flex; flex-direction:column; gap:2px; min-width: 260px;}
-    .brand .t{font-weight:800; letter-spacing:.2px}
+    .brand{display:flex; flex-direction:column; gap:2px; min-width:280px;}
+    .brand .t{font-weight:900; letter-spacing:.2px}
     .brand .s{font-size:12px; color:var(--muted)}
     .hud{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
     .pill{
-      background: rgba(255,255,255,.06);
+      background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
       border-radius:999px;
       padding:8px 10px;
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
       font-size:12px;
       display:flex; gap:8px; align-items:center;
       backdrop-filter: blur(8px);
@@ -52,65 +50,64 @@
     .pill b{font-size:13px}
     .btn{
       border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.08);
+      background:rgba(255,255,255,.08);
       color:var(--ink);
       border-radius:12px;
       padding:10px 12px;
       cursor:pointer;
-      font-weight:800;
-      box-shadow: var(--shadow);
-      transition: transform .05s ease;
+      font-weight:850;
+      box-shadow:var(--shadow);
       user-select:none;
+      transition: transform .05s ease;
     }
-    .btn:active{transform: translateY(1px)}
-    main{flex:1; display:flex; flex-direction:column; gap:10px; padding:0 12px 12px;}
-    .topRow{display:flex; gap:10px; align-items:stretch;}
+    .btn:active{transform:translateY(1px)}
+    main{flex:1; padding:0 12px 12px; display:flex; flex-direction:column; gap:10px;}
+    .row{display:flex; gap:10px; align-items:stretch;}
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+      border:1px solid var(--border);
       border-radius:18px;
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
       padding:12px;
       backdrop-filter: blur(10px);
     }
-    .qCard{flex: 1.2; min-height:130px; position:relative; overflow:hidden;}
-    .qTitle{display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;}
+    .qCard{flex:1.2; min-height:140px; position:relative; overflow:hidden;}
+    .qTitle{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
     .badge{
       font-size:12px;
       padding:6px 10px;
       border-radius:999px;
-      background: rgba(100,181,255,.16);
+      background:rgba(100,181,255,.16);
       border:1px solid rgba(100,181,255,.35);
       white-space:nowrap;
     }
-    .qText{font-size:16px; line-height:1.28; font-weight:800;}
-    .choices{margin-top:10px; display:grid; grid-template-columns:1fr; gap:6px;}
+    .qText{margin-top:8px; font-size:16px; line-height:1.28; font-weight:900;}
+    .choices{margin-top:10px; display:grid; gap:6px;}
     .choice{
       display:flex; gap:10px; align-items:center;
       padding:9px 10px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.10);
+      background:rgba(0,0,0,.10);
       font-size:13px;
     }
     .tag{
       width:30px; height:30px; border-radius:10px;
       display:grid; place-items:center;
-      font-weight:950;
-      color:#0b1220;
+      font-weight:950; color:#0b1220;
     }
-    .tag.A{background: var(--laneA)}
-    .tag.B{background: var(--laneB)}
-    .tag.C{background: var(--laneC)}
+    .tag.A{background:var(--a)}
+    .tag.B{background:var(--b)}
+    .tag.C{background:var(--c)}
     .muted{color:var(--muted)}
-    .gameCard{flex: 1.8; padding:10px; display:flex; flex-direction:column; gap:10px;}
+    .gameCard{flex:1.8; display:flex; flex-direction:column; gap:10px; padding:10px;}
     canvas{
       width:100%;
-      height: min(54dvh, 520px);
+      height:min(56dvh, 540px);
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.10));
-      box-shadow: var(--shadow);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));
+      box-shadow:var(--shadow);
       touch-action:none;
     }
     .controls{
@@ -123,8 +120,8 @@
       border-radius:16px;
       padding:12px 10px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.08);
-      box-shadow: var(--shadow);
+      background:rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
       user-select:none;
       display:flex; flex-direction:column; gap:4px;
       align-items:center;
@@ -132,55 +129,52 @@
       text-align:center;
     }
     .ctl small{font-weight:700; color:var(--muted); line-height:1.2;}
-    .ctl.up{outline:2px solid rgba(124,92,255,.22)}
-    .ctl.mid{outline:2px solid rgba(51,214,255,.22)}
-    .ctl.down{outline:2px solid rgba(255,122,217,.20)}
     .footerRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; padding:2px 2px 0;}
     .tiny{font-size:12px; color:var(--muted)}
+
+    .pop{
+      position:absolute;
+      left:50%; top:56%;
+      transform:translate(-50%,-50%);
+      padding:12px 14px;
+      border-radius:18px;
+      font-weight:950;
+      display:none;
+      z-index:5;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(8px);
+      text-align:center;
+      min-width:280px;
+    }
+    .pop.good{background:rgba(57,217,138,.20)}
+    .pop.bad{background:rgba(255,92,122,.18)}
+    .pop .why{display:block; margin-top:6px; font-size:12px; color:var(--muted); font-weight:700}
 
     .overlay{
       position:fixed; inset:0;
       display:none;
-      background: rgba(0,0,0,.55);
+      background:rgba(0,0,0,.55);
       backdrop-filter: blur(6px);
       align-items:center; justify-content:center;
       padding:16px;
-      z-index: 50;
+      z-index:50;
     }
     .modal{
-      width:min(780px, 96vw);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      width:min(820px, 96vw);
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
       border:1px solid rgba(255,255,255,.14);
       border-radius:22px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.55);
+      box-shadow:0 20px 60px rgba(0,0,0,.55);
       padding:14px;
     }
     .modal h2{margin:6px 0 8px}
     .modal p, .modal li{color:var(--muted)}
     .modal .row{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px;}
 
-    .pop{
-      position:absolute;
-      left:50%; top:54%;
-      transform: translate(-50%,-50%);
-      padding:12px 14px;
-      border-radius:18px;
-      font-weight:950;
-      display:none;
-      z-index: 5;
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-      text-align:center;
-      min-width: 260px;
-    }
-    .pop.good{background: rgba(57,217,138,.20);}
-    .pop.bad{background: rgba(255,92,122,.18);}
-    .pop .why{display:block; margin-top:6px; font-size:12px; color:var(--muted); font-weight:700}
-
     @media (max-width: 900px){
-      .topRow{flex-direction:column}
-      canvas{height: min(52dvh, 440px);}
+      .row{flex-direction:column}
+      canvas{height:min(52dvh, 460px);}
     }
   </style>
 </head>
@@ -188,8 +182,8 @@
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="t">GBL Runner — Mobile Security</div>
-      <div class="s">Pick a lane: A (top) • B (middle) • C (bottom). Keys: ↑/↓ or W/S or A/D</div>
+      <div class="t">GBL Platformer — Mario-Style (Educational)</div>
+      <div class="s">Run & Jump • Hit A/B/C blocks to answer • Works on mobile + desktop</div>
     </div>
     <div class="hud">
       <div class="pill">Score: <b id="score">0</b></div>
@@ -201,13 +195,11 @@
   </header>
 
   <main>
-    <div class="topRow">
+    <div class="row">
       <section class="card qCard" aria-live="polite">
         <div class="qTitle">
           <div class="badge" id="topicBadge">Ready</div>
-          <div class="tiny muted" id="hint">
-            Move lane and choose A/B/C. Gates start after a short reading delay.
-          </div>
+          <div class="tiny muted" id="hint">Tip: When question appears, jump and hit the A/B/C block.</div>
         </div>
         <div class="qText" id="qText">Press Start to begin.</div>
         <div class="choices" id="choices"></div>
@@ -218,19 +210,22 @@
         <canvas id="c"></canvas>
 
         <div class="controls">
-          <div class="ctl up" id="laneUp" role="button" tabindex="0">▲ Lane Up
-            <small>Top = A</small>
+          <div class="ctl" id="leftBtn" role="button" tabindex="0">
+            ◀ Move
+            <small>← / A</small>
           </div>
-          <div class="ctl mid" id="confirm" role="button" tabindex="0">Confirm
-            <small>Enter / Space</small>
+          <div class="ctl" id="jumpBtn" role="button" tabindex="0">
+            ⤒ Jump
+            <small>Space / ↑</small>
           </div>
-          <div class="ctl down" id="laneDown" role="button" tabindex="0">▼ Lane Down
-            <small>Bottom = C</small>
+          <div class="ctl" id="rightBtn" role="button" tabindex="0">
+            Move ▶
+            <small>→ / D</small>
           </div>
         </div>
 
         <div class="footerRow">
-          <div class="tiny">Data stored locally • End screen allows CSV download</div>
+          <div class="tiny">No game-over on wrong answers • Respawns safely if you fall • End screen offers CSV download</div>
           <button class="btn" id="startBtn">Start</button>
         </div>
       </section>
@@ -243,11 +238,11 @@
     <h2 id="modalTitle">How to Play</h2>
     <div id="modalBody">
       <ul>
-        <li>Each question has three options (A/B/C) mapped to three lanes.</li>
-        <li><b>Top lane = A</b>, <b>Middle lane = B</b>, <b>Bottom lane = C</b>.</li>
-        <li>Use <b>↑/↓</b> (or <b>W/S</b> or <b>A/D</b>) to change lane.</li>
-        <li>Gates start moving after a short reading delay. Your current lane is your answer.</li>
-        <li>You may also press <b>Enter/Space</b> to lock your answer early.</li>
+        <li>Move with <b>Left/Right</b> (←/→ or A/D). Jump with <b>Space</b> (or ↑). On mobile, use the buttons.</li>
+        <li>When a question appears, three answer blocks <b>A / B / C</b> appear ahead.</li>
+        <li>Jump to hit the block of your chosen option. You get instant feedback and continue.</li>
+        <li>Wrong answer does not stop the level (you just don’t get the points).</li>
+        <li>At the end, download CSV for analysis.</li>
       </ul>
     </div>
     <div class="row">
@@ -258,60 +253,56 @@
 
 <script>
 /* =========================
-   TUNING (slow + readable)
-   ========================= */
-const READ_DELAY_MS = 2200;   // time before gates move (reading time)
-const GATE_SPEED    = 3.1;    // gate movement speed (lower = slower)
-
-/* =========================
    QUESTION BANK (A/B/C)
+   Based on the attached chapters (Smartphone, Android, iOS security).
+   Keep questions short for on-screen readability.
    ========================= */
 const QUESTION_BANK = [
   {id:"AS01",topic:"Android: Access control",q:"Why enable SIM card lock on Android?",
-   A:"To require a PIN before the SIM works after power-on",B:"To boost Wi-Fi speed",C:"To auto-install updates",correct:"A",
+   A:"Require PIN before SIM works after power-on",B:"Boost Wi-Fi speed",C:"Auto-install updates",correct:"A",
    why:"SIM lock prevents SIM use without the PIN after restart."},
-  {id:"AS02",topic:"Android: Screen lock",q:"Which screen lock is recommended for stronger security?",
+  {id:"AS02",topic:"Android: Screen lock",q:"Which lock is stronger for Android devices?",
    A:"PIN or Password",B:"No lock for convenience",C:"Wallpaper lock",correct:"A",
    why:"PIN/password can be stronger and longer than patterns."},
-  {id:"AS03",topic:"Android: Encryption",q:"On Android 4.0+ what security feature should be turned on?",
+  {id:"AS03",topic:"Android: Encryption",q:"On Android 4.0+ which feature should be enabled?",
    A:"Device encryption",B:"Always-on NFC",C:"Auto caller ID hide",correct:"A",
    why:"Encryption protects stored data if the phone is lost."},
-  {id:"AS04",topic:"Android: Network hygiene",q:"What should you turn off by default when not in use?",
-   A:"Wi-Fi and Bluetooth",B:"Screen brightness only",C:"Alarm clock",correct:"A",
+  {id:"AS04",topic:"Android: Network hygiene",q:"Which radios should be off when not needed?",
+   A:"Wi-Fi and Bluetooth",B:"Only brightness",C:"Alarm clock",correct:"A",
    why:"Disabling radios reduces exposure and attack surface."},
-  {id:"AS05",topic:"Android: NFC",q:"If NFC is on by default, what is the safer practice?",
-   A:"Switch it off manually when not needed",B:"Keep it on permanently",C:"Turn off screen lock",correct:"A",
-   why:"NFC should not run by default unless required."},
-  {id:"SS01",topic:"Smartphones: App install",q:"Safest general place to install apps from is:",
-   A:"Official app stores",B:"Random APK sites",C:"Unknown links in messages",correct:"A",
+  {id:"AS05",topic:"Android: NFC",q:"If NFC is on by default, safer practice is:",
+   A:"Turn it off when not needed",B:"Keep it on permanently",C:"Disable screen lock",correct:"A",
+   why:"NFC should be on only when required."},
+  {id:"SS01",topic:"Smartphones: App install",q:"Safest place to install apps from is:",
+   A:"Official app stores",B:"Random APK websites",C:"Unknown message links",correct:"A",
    why:"Official stores reduce (not remove) malware risk."},
-  {id:"SS03",topic:"Smartphones: Permissions",q:"If an app requests unnecessary permissions, you should:",
-   A:"Be suspicious; consider declining/uninstalling",B:"Always accept to continue",C:"Disable screen lock",correct:"A",
+  {id:"SS03",topic:"Smartphones: Permissions",q:"If an app asks unnecessary permissions, you should:",
+   A:"Be suspicious; decline/uninstall",B:"Always accept to continue",C:"Disable passcode",correct:"A",
    why:"Unnecessary permissions can indicate data harvesting."},
+  {id:"SS04",topic:"Smartphones: Unused apps",q:"Why uninstall apps you no longer use?",
+   A:"Ownership may change and updates can become risky",B:"It encrypts SMS",C:"It blocks GPS forever",correct:"A",
+   why:"Apps can later introduce unwanted behavior via updates."},
   {id:"SS06",topic:"Mobile networks",q:"SMS text messages are generally:",
    A:"Sent unencrypted",B:"End-to-end encrypted by default",C:"Encrypted by screen lock",correct:"A",
-   why:"SMS is often vulnerable to interception on networks."},
-  {id:"SS08",topic:"Secure messaging",q:"Which app is widely used for secure messaging with encryption?",
+   why:"SMS can be vulnerable to interception."},
+  {id:"SS07",topic:"Mobile threats",q:"An IMSI catcher can be used to:",
+   A:"Act like a fake cell tower to track/intercept",B:"Improve battery health",C:"Encrypt backups",correct:"A",
+   why:"It can trick phones into connecting to it."},
+  {id:"SS08",topic:"Secure messaging",q:"A common encrypted messaging app is:",
    A:"Signal",B:"Any SMS app",C:"Caller ID hide feature",correct:"A",
-   why:"Signal provides encrypted messages and calls."},
-  {id:"IOS01",topic:"iOS: Encryption",q:"On iOS, tying encryption to your data requires you to set a:",
+   why:"Signal supports encrypted messages and calls."},
+  {id:"IOS01",topic:"iOS: Data protection",q:"On iOS, encryption is strongest when you set a:",
    A:"Passcode / passphrase",B:"Wallpaper",C:"Ringtone",correct:"A",
-   why:"Passcode enables data protection mechanisms."},
-  {id:"IOS03",topic:"iOS: Backup",q:"In iTunes, which option encrypts backups on your computer?",
+   why:"Passcode enables iOS data protection features."},
+  {id:"IOS02",topic:"iOS: Passcode strength",q:"A stronger iOS passcode is ideally:",
+   A:"Long alphanumeric",B:"Always 4 digits",C:"No passcode if FaceID exists",correct:"A",
+   why:"Longer alphanumeric codes are harder to crack."},
+  {id:"IOS03",topic:"iOS: Backup",q:"In iTunes, which option encrypts local backups?",
    A:"Encrypt backup",B:"Fast sync",C:"Share analytics",correct:"A",
    why:"Backups are not encrypted by default unless enabled."},
-  {id:"IOS04",topic:"iOS: Device wipe",q:"A safety feature can erase data after:",
-   A:"10 failed passcode attempts",B:"10 minutes of no Wi-Fi",C:"10 missed calls",correct:"A",
-   why:"This can protect data during physical attack attempts."},
-  {id:"SS07",topic:"Mobile threats",q:"An IMSI catcher can be used to:",
-   A:"Pretend to be a cell tower to intercept/track",B:"Improve battery health",C:"Encrypt backups",correct:"A",
-   why:"It can trick phones into connecting to it."},
-  {id:"SS05",topic:"Encryption reality",q:"Encryption protects data best when the phone is:",
-   A:"Powered down/rebooted and not unlocked",B:"Unlocked and in use",C:"On speakerphone",correct:"A",
-   why:"Unlocked devices can expose data despite encryption."},
-  {id:"AS08",topic:"Android: Updates",q:"Two updates you should regularly check are:",
-   A:"OS updates and installed app updates",B:"Wallpaper packs only",C:"Font updates only",correct:"A",
-   why:"Updates patch known vulnerabilities."},
+  {id:"IOS04",topic:"iOS: Safety feature",q:"A safety feature can erase data after:",
+   A:"10 failed passcode attempts",B:"10 minutes no Wi-Fi",C:"10 missed calls",correct:"A",
+   why:"Helps protect data during repeated guessing attempts."}
 ];
 
 function shuffle(arr){
@@ -322,22 +313,15 @@ function shuffle(arr){
   }
   return a;
 }
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
 
-const state = {
-  running:false,
-  idx:0,
-  questions:[],
-  score:0,
-  correct:0,
-  attempted:0,
-  current:null,
-  lane:1,             // 0=A (top), 1=B (mid), 2=C (bottom)
-  locked:false,        // confirm lock
-  popUntil:0,
-  log:[]
-};
-
-// UI
+/* =========================
+   UI
+   ========================= */
 const scoreEl = document.getElementById("score");
 const accEl   = document.getElementById("acc");
 const qnumEl  = document.getElementById("qnum");
@@ -350,8 +334,96 @@ const overlay = document.getElementById("overlay");
 
 document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
 document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
-document.getElementById("restartBtn").onclick = ()=> boot();
+document.getElementById("restartBtn").onclick = ()=> boot(true);
 document.getElementById("startBtn").onclick = ()=> { if(!state.running) startGame(); };
+
+/* =========================
+   GAME TUNING (readable pace)
+   ========================= */
+const RUN_SPEED      = 3.0;     // horizontal speed (player max)
+const GRAVITY        = 0.75;    // gravity
+const JUMP_VEL       = -13.5;   // jump strength
+const FRICTION       = 0.82;    // ground friction
+const AIR_FRICTION   = 0.93;    // air friction
+const CAMERA_LERP    = 0.09;    // camera smoothing
+const SAFE_FALL_Y    = 1200;    // reset if player falls
+const LEVEL_END_X    = 5200;    // end position
+const QUESTIONS_PER_RUN = 10;   // keep short (low load)
+const FEEDBACK_MS    = 950;     // popup duration
+
+/* =========================
+   WORLD / LEVEL
+   Simple tile-like rectangles and coins.
+   ========================= */
+function makeLevel(){
+  // platforms: {x,y,w,h}
+  const p = [];
+  // ground segments with some gaps (pits)
+  p.push({x:0,y:420,w:900,h:60});
+  p.push({x:980,y:420,w:820,h:60});
+  p.push({x:1880,y:420,w:820,h:60});
+  p.push({x:2800,y:420,w:900,h:60});
+  p.push({x:3800,y:420,w:950,h:60});
+  p.push({x:4850,y:420,w:520,h:60});
+
+  // small raised platforms
+  p.push({x:520,y:320,w:180,h:20});
+  p.push({x:1240,y:300,w:220,h:20});
+  p.push({x:2140,y:310,w:220,h:20});
+  p.push({x:3040,y:290,w:260,h:20});
+  p.push({x:4100,y:300,w:220,h:20});
+
+  // staircase blocks
+  p.push({x:1450,y:360,w:80,h:60});
+  p.push({x:1535,y:330,w:80,h:90});
+  p.push({x:1620,y:300,w:80,h:120});
+
+  // goal platform area
+  p.push({x:5000,y:320,w:220,h:20});
+
+  // coins (mostly cosmetic)
+  const coins = [];
+  function coinLine(x0,y0,n,dx){
+    for(let i=0;i<n;i++) coins.push({x:x0+i*dx,y:y0,r:8,taken:false});
+  }
+  coinLine(200,360,6,40);
+  coinLine(560,280,4,40);
+  coinLine(1100,360,6,40);
+  coinLine(2000,360,5,40);
+  coinLine(2840,360,6,40);
+  coinLine(4100,260,4,40);
+
+  // checkpoints where a question triggers
+  const checkpoints = [
+    {x:620, used:false},
+    {x:1320, used:false},
+    {x:2200, used:false},
+    {x:3120, used:false},
+    {x:4020, used:false},
+    {x:4900, used:false},
+  ];
+
+  return {platforms:p, coins, checkpoints};
+}
+
+/* =========================
+   STATE
+   ========================= */
+const state = {
+  running:false,
+  phase:"menu",          // menu | play | quiz | end
+  score:0,
+  correct:0,
+  attempted:0,
+  questions:[],
+  qIndex:0,
+  current:null,
+  log:[],
+  popUntil:0,
+  cameraX:0,
+  lastSafeX:80,
+  lastSafeY:260
+};
 
 function updateHUD(){
   scoreEl.textContent = String(state.score);
@@ -365,28 +437,11 @@ function renderQuestion(q){
   state.current = q;
   topicBadge.textContent = q.topic;
   qTextEl.textContent = q.q;
-
-  const rows = [
-    {k:"A", txt:q.A, cls:"A"},
-    {k:"B", txt:q.B, cls:"B"},
-    {k:"C", txt:q.C, cls:"C"},
-  ];
-  choicesEl.innerHTML = rows.map(r => `
-    <div class="choice">
-      <div class="tag ${r.cls}">${r.k}</div>
-      <div><b>${escapeHtml(r.txt)}</b></div>
-    </div>
-  `).join("");
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[m]));
-}
-
-function laneToKey(lane){
-  return lane===0 ? "A" : lane===1 ? "B" : "C";
+  choicesEl.innerHTML = `
+    <div class="choice"><div class="tag A">A</div><div><b>${escapeHtml(q.A)}</b></div></div>
+    <div class="choice"><div class="tag B">B</div><div><b>${escapeHtml(q.B)}</b></div></div>
+    <div class="choice"><div class="tag C">C</div><div><b>${escapeHtml(q.C)}</b></div></div>
+  `;
 }
 
 function showPopup(ok, correctKey, why){
@@ -394,17 +449,11 @@ function showPopup(ok, correctKey, why){
   popupEl.style.display = "block";
   popupEl.innerHTML = (ok ? "✅ Correct!" : "❌ Wrong!") +
     `<span class="why">Correct: ${correctKey}. ${escapeHtml(why)}</span>`;
-  state.popUntil = performance.now() + 950;
-}
-
-function hidePopupIfNeeded(now){
-  if(popupEl.style.display==="block" && now > state.popUntil){
-    popupEl.style.display="none";
-  }
+  state.popUntil = performance.now() + FEEDBACK_MS;
 }
 
 /* =========================
-   CANVAS VISUALS (better runner + lanes)
+   CANVAS + RENDERING
    ========================= */
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
@@ -418,39 +467,141 @@ function fitCanvas(){
 }
 window.addEventListener("resize", fitCanvas);
 
-const scene = {
-  scroll:0,
-  stars:[],
-  laneY:[],
-  runner:{ x:95, y:0, w:44, h:54, legPhase:0 },
-  gates:null,
-  phase:"idle",     // "idle" | "reading" | "moving"
-  phaseStart:0,
-  shakeUntil:0
+const world = {
+  ...makeLevel(),
+  stars:[]
 };
 
-function initScene(){
-  fitCanvas();
+function initStars(){
   const rect = canvas.getBoundingClientRect();
   const w = rect.width, h = rect.height;
-
-  scene.laneY = [h*0.28, h*0.50, h*0.72];
-  scene.runner.y = scene.laneY[state.lane];
-
-  scene.stars = [];
-  for(let i=0;i<70;i++){
-    scene.stars.push({
-      x: Math.random()*w,
-      y: Math.random()*h*0.6,
-      r: 0.6 + Math.random()*1.7,
-      s: 0.2 + Math.random()*0.9
-    });
+  world.stars = [];
+  for(let i=0;i<80;i++){
+    world.stars.push({x:Math.random()*w, y:Math.random()*h*0.6, r:0.7+Math.random()*1.5, s:0.2+Math.random()*0.9});
   }
+}
 
-  scene.gates = null;
-  scene.phase = "idle";
-  scene.phaseStart = performance.now();
-  scene.shakeUntil = 0;
+/* Player */
+const player = {
+  x:80, y:260, w:38, h:52,
+  vx:0, vy:0,
+  onGround:false,
+  face:1,          // 1 right, -1 left
+  step:0
+};
+
+/* Input */
+const input = {left:false,right:false,jump:false,jumpQueued:false};
+
+function keyDown(e){
+  if(e.code==="ArrowLeft" || e.code==="KeyA") input.left = true;
+  if(e.code==="ArrowRight" || e.code==="KeyD") input.right = true;
+  if(e.code==="ArrowUp" || e.code==="Space") { input.jump = true; input.jumpQueued = true; }
+}
+function keyUp(e){
+  if(e.code==="ArrowLeft" || e.code==="KeyA") input.left = false;
+  if(e.code==="ArrowRight" || e.code==="KeyD") input.right = false;
+  if(e.code==="ArrowUp" || e.code==="Space") input.jump = false;
+}
+window.addEventListener("keydown", (e)=>{ if(["ArrowLeft","ArrowRight","ArrowUp","Space","KeyA","KeyD"].includes(e.code)) e.preventDefault(); keyDown(e); });
+window.addEventListener("keyup", keyUp);
+
+/* Mobile buttons */
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+const jumpBtn = document.getElementById("jumpBtn");
+
+function bindHold(btn, onDown, onUp){
+  btn.addEventListener("pointerdown",(e)=>{ e.preventDefault(); onDown(); });
+  btn.addEventListener("pointerup",(e)=>{ e.preventDefault(); onUp(); });
+  btn.addEventListener("pointercancel",(e)=>{ e.preventDefault(); onUp(); });
+  btn.addEventListener("pointerleave",(e)=>{ /* don't force up */ });
+}
+bindHold(leftBtn, ()=>input.left=true, ()=>input.left=false);
+bindHold(rightBtn, ()=>input.right=true, ()=>input.right=false);
+jumpBtn.addEventListener("pointerdown",(e)=>{ e.preventDefault(); input.jumpQueued = true; });
+
+/* Collisions */
+function aabb(a,b){
+  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+}
+function resolvePlatformCollisions(){
+  player.onGround = false;
+  for(const pl of world.platforms){
+    // broadphase
+    if(player.x + player.w < pl.x || player.x > pl.x + pl.w) continue;
+    if(player.y + player.h < pl.y || player.y > pl.y + pl.h) continue;
+
+    // compute overlap
+    const ox1 = (pl.x + pl.w) - player.x;
+    const ox2 = (player.x + player.w) - pl.x;
+    const oy1 = (pl.y + pl.h) - player.y;
+    const oy2 = (player.y + player.h) - pl.y;
+    const ox = Math.min(ox1, ox2);
+    const oy = Math.min(oy1, oy2);
+
+    if(ox < oy){
+      // horizontal
+      if(player.x < pl.x) player.x -= ox;
+      else player.x += ox;
+      player.vx = 0;
+    } else {
+      // vertical
+      if(player.y < pl.y){
+        player.y -= oy;
+        player.vy = 0;
+        player.onGround = true;
+        state.lastSafeX = player.x;
+        state.lastSafeY = player.y;
+      } else {
+        player.y += oy;
+        player.vy = 0;
+      }
+    }
+  }
+}
+
+/* Quiz blocks spawned at checkpoints */
+let quizBlocks = []; // {x,y,w,h,key,hit:false}
+let quizAnchorX = 0;
+
+function spawnQuizBlocks(atX){
+  // Place blocks ahead at three heights, like Mario question bricks.
+  quizAnchorX = atX + 240;
+  const topY = 240, midY = 290, botY = 340; // screen-space-ish; we will use world y
+  // We anchor them around ground height (420) so they appear reachable
+  // Convert to world y so player can jump from ground
+  const baseY = 260; // block top baseline relative to world
+  quizBlocks = [
+    {key:"A", x:quizAnchorX,     y:baseY-90, w:46, h:46, hit:false},
+    {key:"B", x:quizAnchorX+70,  y:baseY-60, w:46, h:46, hit:false},
+    {key:"C", x:quizAnchorX+140, y:baseY-30, w:46, h:46, hit:false},
+  ];
+}
+
+function drawBlock(b){
+  const col = b.key==="A" ? getCss("--a") : b.key==="B" ? getCss("--b") : getCss("--c");
+  ctx.save();
+  ctx.globalAlpha = b.hit ? 0.25 : 0.92;
+
+  // body
+  ctx.fillStyle = col;
+  roundRect(b.x, b.y, b.w, b.h, 10);
+  ctx.fill();
+
+  // highlight
+  ctx.globalAlpha *= 0.35;
+  ctx.fillStyle = "white";
+  roundRect(b.x+6, b.y+6, b.w-12, 10, 6);
+  ctx.fill();
+
+  // label
+  ctx.globalAlpha = b.hit ? 0.25 : 1;
+  ctx.fillStyle = "rgba(11,18,32,.92)";
+  ctx.font = "950 20px system-ui,Segoe UI,Arial";
+  ctx.fillText(b.key, b.x + b.w/2 - 7, b.y + 30);
+
+  ctx.restore();
 }
 
 function roundRect(x,y,w,h,r){
@@ -467,289 +618,397 @@ function getCss(name){
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-function drawRunner(now){
-  const r = scene.runner;
-  const w = r.w, h = r.h;
-  const x = r.x, y = r.y;
+/* Detect hitting block from below */
+function checkHitQuizBlocks(){
+  if(state.phase !== "quiz") return;
 
-  // smooth lane follow
-  const targetY = scene.laneY[state.lane];
-  r.y += (targetY - r.y) * 0.18;
+  const head = {x:player.x+6, y:player.y-4, w:player.w-12, h:8};
+  for(const b of quizBlocks){
+    if(b.hit) continue;
 
-  // step animation
-  r.legPhase += (scene.phase==="moving" ? 0.22 : 0.08);
-
-  // shadow
-  ctx.fillStyle = "rgba(0,0,0,.35)";
-  ctx.beginPath();
-  ctx.ellipse(x+18, r.y + h/2 + 30, 20, 7, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // outer suit
-  const suitGrad = ctx.createLinearGradient(x, y-h/2, x+w, y+h/2);
-  suitGrad.addColorStop(0, "rgba(255,255,255,.92)");
-  suitGrad.addColorStop(1, "rgba(200,220,255,.80)");
-  ctx.fillStyle = suitGrad;
-  roundRect(x, r.y-h/2, w, h, 16);
-  ctx.fill();
-
-  // suit outline
-  ctx.strokeStyle = "rgba(100,181,255,.35)";
-  ctx.lineWidth = 2;
-  roundRect(x, r.y-h/2, w, h, 16);
-  ctx.stroke();
-
-  // helmet visor
-  const visor = ctx.createLinearGradient(x+6, r.y-h/2+10, x+w-6, r.y-h/2+24);
-  visor.addColorStop(0, "rgba(100,181,255,.75)");
-  visor.addColorStop(1, "rgba(124,92,255,.55)");
-  ctx.fillStyle = visor;
-  roundRect(x+7, r.y-h/2+10, w-14, 14, 9);
-  ctx.fill();
-
-  // glow stripe
-  ctx.fillStyle = "rgba(255,255,255,.22)";
-  roundRect(x+10, r.y-h/2+30, w-20, 8, 6);
-  ctx.fill();
-
-  // legs
-  const step = Math.sin(r.legPhase) * 7;
-  ctx.strokeStyle = "rgba(255,255,255,.88)";
-  ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  ctx.beginPath(); ctx.moveTo(x+14, r.y+h/2-4); ctx.lineTo(x+14+step, r.y+h/2+14); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x+w-14, r.y+h/2-4); ctx.lineTo(x+w-14-step, r.y+h/2+14); ctx.stroke();
-
-  // small jet sparkle (just visual, not violent)
-  if(scene.phase==="moving" && (Math.sin(now/70) > 0.65)){
-    ctx.fillStyle = "rgba(255,209,102,.70)";
-    ctx.beginPath(); ctx.arc(x-6, r.y+8, 4, 0, Math.PI*2); ctx.fill();
-  }
-}
-
-function drawScene(now){
-  const rect = canvas.getBoundingClientRect();
-  const W = rect.width, H = rect.height;
-
-  let shakeX = 0;
-  if(now < scene.shakeUntil) shakeX = (Math.random()*2-1) * 2.0;
-
-  ctx.save();
-  ctx.translate(shakeX, 0);
-
-  ctx.clearRect(0,0,W,H);
-
-  // starfield
-  ctx.fillStyle = "rgba(255,255,255,.80)";
-  for(const st of scene.stars){
-    const x = (st.x - scene.scroll*st.s*0.35 + W) % W;
-    ctx.beginPath();
-    ctx.arc(x, st.y, st.r, 0, Math.PI*2);
-    ctx.fill();
-  }
-
-  // lane guides
-  ctx.strokeStyle = "rgba(255,255,255,.10)";
-  ctx.lineWidth = 2;
-  for(let i=0;i<3;i++){
-    ctx.beginPath();
-    ctx.moveTo(0, scene.laneY[i]);
-    ctx.lineTo(W, scene.laneY[i]);
-    ctx.stroke();
-  }
-
-  // current lane highlight
-  const laneColor = state.lane===0 ? getCss("--laneA") : state.lane===1 ? getCss("--laneB") : getCss("--laneC");
-  ctx.fillStyle = laneColor;
-  ctx.globalAlpha = 0.12;
-  ctx.fillRect(0, scene.laneY[state.lane]-40, W, 80);
-  ctx.globalAlpha = 1;
-
-  // ground strip
-  const groundY = H*0.84;
-  ctx.fillStyle = "rgba(255,255,255,.06)";
-  ctx.fillRect(0, groundY, W, H-groundY);
-
-  // moving floor dashes
-  scene.scroll += (scene.phase==="moving" ? 2.0 : 0.7);
-  ctx.strokeStyle = "rgba(255,255,255,.14)";
-  ctx.lineWidth = 6;
-  for(let x=-(scene.scroll%90); x<W; x+=90){
-    ctx.beginPath();
-    ctx.moveTo(x, groundY+24);
-    ctx.lineTo(x+38, groundY+24);
-    ctx.stroke();
-  }
-
-  // gates
-  if(scene.gates){
-    const g = scene.gates;
-    const cols = [
-      {k:"A", y: scene.laneY[0], color:getCss("--laneA")},
-      {k:"B", y: scene.laneY[1], color:getCss("--laneB")},
-      {k:"C", y: scene.laneY[2], color:getCss("--laneC")},
-    ];
-    for(const c of cols){
-      ctx.fillStyle = c.color;
-      ctx.globalAlpha = 0.86;
-      roundRect(g.x, c.y - g.h/2, g.w, g.h, 16);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-
-      // label
-      ctx.fillStyle = "rgba(11,18,32,.92)";
-      ctx.font = "950 22px system-ui,Segoe UI,Arial";
-      ctx.fillText(c.k, g.x + g.w/2 - 7, c.y + 8);
-
-      // tiny "Option"
-      ctx.fillStyle = "rgba(11,18,32,.70)";
-      ctx.font = "800 12px system-ui,Segoe UI,Arial";
-      ctx.fillText("Option", g.x + 10, c.y + g.h/2 - 10);
+    // if player moving up and head intersects bottom of block
+    const bottomBand = {x:b.x, y:b.y+b.h-6, w:b.w, h:10};
+    if(player.vy < -1 && aabb(head, bottomBand)){
+      b.hit = true;
+      handleAnswer(b.key);
+      break;
     }
   }
-
-  // runner
-  drawRunner(now);
-
-  ctx.restore();
 }
 
-/* =========================
-   INPUT (lane select)
-   ========================= */
-function laneUp(){
-  if(!state.running) return;
-  state.lane = Math.max(0, state.lane - 1);
-}
-function laneDown(){
-  if(!state.running) return;
-  state.lane = Math.min(2, state.lane + 1);
-}
-function confirmLock(){
-  if(!state.running) return;
-  state.locked = true;
-}
-
-document.getElementById("laneUp").addEventListener("pointerdown",(e)=>{ e.preventDefault(); laneUp(); });
-document.getElementById("laneDown").addEventListener("pointerdown",(e)=>{ e.preventDefault(); laneDown(); });
-document.getElementById("confirm").addEventListener("pointerdown",(e)=>{ e.preventDefault(); confirmLock(); });
-
-window.addEventListener("keydown",(e)=>{
-  if(!state.running) return;
-
-  // up/down
-  if(e.code==="ArrowUp" || e.code==="KeyW"){ e.preventDefault(); laneUp(); }
-  if(e.code==="ArrowDown" || e.code==="KeyS"){ e.preventDefault(); laneDown(); }
-
-  // alternative A/D to move (common for games)
-  if(e.code==="KeyA"){ e.preventDefault(); laneUp(); }
-  if(e.code==="KeyD"){ e.preventDefault(); laneDown(); }
-
-  // confirm
-  if(e.code==="Enter" || e.code==="Space"){ e.preventDefault(); confirmLock(); }
-});
-
-/* =========================
-   GAME FLOW
-   ========================= */
-function boot(){
-  state.running = false;
-  state.idx = 0;
-  state.score = 0;
-  state.correct = 0;
-  state.attempted = 0;
-  state.current = null;
-  state.lane = 1;
-  state.locked = false;
-  state.log = [];
-  popupEl.style.display = "none";
-
-  const shuffled = shuffle(QUESTION_BANK);
-  state.questions = shuffled.slice(0, Math.min(15, shuffled.length));
-  qtotalEl.textContent = String(state.questions.length);
-
-  updateHUD();
-  topicBadge.textContent = "Ready";
-  qTextEl.textContent = "Press Start to begin.";
-  choicesEl.innerHTML = "";
-
-  initScene();
-}
-
-function startGame(){
-  state.running = true;
-  document.getElementById("startBtn").textContent = "Running…";
-  document.getElementById("startBtn").disabled = true;
-  nextQuestion();
-}
-
-function nextQuestion(){
-  if(state.idx >= state.questions.length){
-    endGame();
-    return;
-  }
-
-  const q = state.questions[state.idx];
-  state.idx += 1;
-  state.locked = false;
-
-  renderQuestion(q);
-  topicBadge.textContent = q.topic;
-
-  // Create gates but keep them paused first (reading phase)
-  const rect = canvas.getBoundingClientRect();
-  scene.gates = {
-    x: rect.width + 30,
-    w: Math.max(96, rect.width*0.14),
-    h: Math.max(72, rect.height*0.18),
-    done:false
-  };
-
-  scene.phase = "reading";
-  scene.phaseStart = performance.now();
-}
-
-function evaluate(){
+/* Answer handling */
+function handleAnswer(selected){
   const q = state.current;
-  const selected = laneToKey(state.lane);
-  const correct = q.correct;
-  const ok = (selected === correct);
+  const ok = (selected === q.correct);
 
   state.attempted += 1;
   if(ok){
     state.correct += 1;
     state.score += 10;
   } else {
-    scene.shakeUntil = performance.now() + 180;
+    // no penalty, still progress
   }
   updateHUD();
-  showPopup(ok, correct, q.why);
+  showPopup(ok, q.correct, q.why);
 
   // log
-  const tNow = new Date().toISOString();
   state.log.push({
-    ts:tNow, qid:q.id, topic:q.topic,
-    selected, correct,
+    ts: new Date().toISOString(),
+    qid: q.id,
+    topic: q.topic,
+    selected,
+    correct: q.correct,
     is_correct: ok ? 1 : 0,
     score_after: state.score,
     question: q.q
   });
+
+  // show feedback briefly then resume
+  setTimeout(()=>{
+    // clear blocks and resume play
+    quizBlocks = [];
+    state.phase = "play";
+    topicBadge.textContent = "Running";
+    // small coin burst effect (simple score bump)
+    if(ok) state.score += 0; // keep learning scoring clean
+    updateHUD();
+    // next question will trigger at next checkpoint
+  }, FEEDBACK_MS + 120);
+}
+
+/* =========================
+   CHECKPOINT / QUESTION FLOW
+   ========================= */
+function prepareQuestions(){
+  const shuffled = shuffle(QUESTION_BANK);
+  state.questions = shuffled.slice(0, Math.min(QUESTIONS_PER_RUN, shuffled.length));
+  state.qIndex = 0;
+  qtotalEl.textContent = String(state.questions.length);
+}
+
+function triggerNextQuestion(){
+  if(state.qIndex >= state.questions.length) return false;
+  const q = state.questions[state.qIndex++];
+  renderQuestion(q);
+  state.phase = "quiz";
+  spawnQuizBlocks(player.x);
+  return true;
+}
+
+/* =========================
+   DRAW WORLD
+   ========================= */
+function draw(now){
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+
+  // hide popup when time passed
+  if(popupEl.style.display==="block" && now > state.popUntil) popupEl.style.display="none";
+
+  ctx.clearRect(0,0,W,H);
+
+  // background stars parallax
+  ctx.fillStyle = "rgba(255,255,255,.80)";
+  for(const st of world.stars){
+    const x = (st.x + (state.cameraX*0.18)*st.s) % W;
+    ctx.beginPath();
+    ctx.arc(x, st.y, st.r, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // camera translate
+  ctx.save();
+  ctx.translate(-state.cameraX, 0);
+
+  // horizon / sky tint
+  const sky = ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,"rgba(100,181,255,.10)");
+  sky.addColorStop(0.55,"rgba(0,0,0,0)");
+  sky.addColorStop(1,"rgba(0,0,0,.25)");
+  ctx.fillStyle = sky;
+  ctx.fillRect(state.cameraX,0,W,H);
+
+  // platforms
+  for(const pl of world.platforms){
+    // base
+    ctx.fillStyle = "rgba(255,255,255,.12)";
+    roundRect(pl.x, pl.y, pl.w, pl.h, 14);
+    ctx.fill();
+    // top shine
+    ctx.fillStyle = "rgba(100,181,255,.10)";
+    roundRect(pl.x+8, pl.y+8, pl.w-16, 12, 8);
+    ctx.fill();
+  }
+
+  // coins
+  for(const c of world.coins){
+    if(c.taken) continue;
+    ctx.save();
+    const g = ctx.createRadialGradient(c.x, c.y, 2, c.x, c.y, c.r*1.8);
+    g.addColorStop(0, "rgba(255,209,102,.95)");
+    g.addColorStop(1, "rgba(255,209,102,.12)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // checkpoint markers (subtle)
+  ctx.strokeStyle = "rgba(255,255,255,.14)";
+  ctx.lineWidth = 2;
+  for(const cp of world.checkpoints){
+    ctx.beginPath();
+    ctx.moveTo(cp.x, 240);
+    ctx.lineTo(cp.x, 420);
+    ctx.stroke();
+  }
+
+  // quiz blocks
+  if(state.phase === "quiz"){
+    for(const b of quizBlocks) drawBlock(b);
+  }
+
+  // goal flag
+  ctx.strokeStyle = "rgba(255,255,255,.55)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(LEVEL_END_X, 240);
+  ctx.lineTo(LEVEL_END_X, 420);
+  ctx.stroke();
+  ctx.fillStyle = "rgba(57,217,138,.80)";
+  roundRect(LEVEL_END_X, 250, 70, 38, 10);
+  ctx.fill();
+  ctx.fillStyle = "rgba(11,18,32,.92)";
+  ctx.font = "900 14px system-ui,Segoe UI,Arial";
+  ctx.fillText("FINISH", LEVEL_END_X+10, 274);
+
+  // player (nice “cyber suit”)
+  drawPlayer(now);
+
+  ctx.restore();
+
+  // ground hints
+  if(state.phase === "quiz"){
+    ctx.fillStyle = "rgba(255,255,255,.10)";
+    ctx.fillRect(0, H-40, W, 40);
+    ctx.fillStyle = "rgba(234,240,255,.92)";
+    ctx.font = "800 12px system-ui,Segoe UI,Arial";
+    ctx.fillText("Answer now: Jump and hit A / B / C block", 12, H-16);
+  }
+}
+
+function drawPlayer(now){
+  player.step += (Math.abs(player.vx) > 0.5 ? 0.22 : 0.08);
+
+  // shadow
+  ctx.fillStyle = "rgba(0,0,0,.30)";
+  ctx.beginPath();
+  ctx.ellipse(player.x + player.w/2, player.y + player.h + 12, 18, 6, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // suit body
+  const g = ctx.createLinearGradient(player.x, player.y, player.x+player.w, player.y+player.h);
+  g.addColorStop(0, "rgba(255,255,255,.92)");
+  g.addColorStop(1, "rgba(200,220,255,.78)");
+  ctx.fillStyle = g;
+  roundRect(player.x, player.y, player.w, player.h, 14);
+  ctx.fill();
+
+  // outline glow
+  ctx.strokeStyle = "rgba(100,181,255,.35)";
+  ctx.lineWidth = 2;
+  roundRect(player.x, player.y, player.w, player.h, 14);
+  ctx.stroke();
+
+  // visor
+  const v = ctx.createLinearGradient(player.x+6, player.y+10, player.x+player.w-6, player.y+26);
+  v.addColorStop(0, "rgba(100,181,255,.75)");
+  v.addColorStop(1, "rgba(124,92,255,.55)");
+  ctx.fillStyle = v;
+  roundRect(player.x+6, player.y+10, player.w-12, 14, 9);
+  ctx.fill();
+
+  // chest stripe
+  ctx.fillStyle = "rgba(255,255,255,.22)";
+  roundRect(player.x+10, player.y+32, player.w-20, 8, 6);
+  ctx.fill();
+
+  // legs
+  const step = Math.sin(player.step) * 7;
+  ctx.strokeStyle = "rgba(255,255,255,.88)";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(player.x+12, player.y+player.h-6);
+  ctx.lineTo(player.x+12+step, player.y+player.h+10);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(player.x+player.w-12, player.y+player.h-6);
+  ctx.lineTo(player.x+player.w-12-step, player.y+player.h+10);
+  ctx.stroke();
+}
+
+/* =========================
+   GAME LOOP
+   ========================= */
+function physicsStep(){
+  if(state.phase === "end" || !state.running) return;
+
+  // during quiz, allow movement but keep it calmer
+  const speedCap = (state.phase === "quiz") ? RUN_SPEED*0.85 : RUN_SPEED;
+
+  if(input.left)  { player.vx -= 0.55; player.face = -1; }
+  if(input.right) { player.vx += 0.55; player.face =  1; }
+
+  if(!input.left && !input.right){
+    player.vx *= (player.onGround ? FRICTION : AIR_FRICTION);
+  }
+
+  // cap speed
+  player.vx = Math.max(-speedCap, Math.min(speedCap, player.vx));
+
+  // jump
+  if(input.jumpQueued){
+    input.jumpQueued = false;
+    if(player.onGround){
+      player.vy = JUMP_VEL;
+      player.onGround = false;
+    }
+  }
+
+  // gravity
+  player.vy += GRAVITY;
+  player.vy = Math.min(player.vy, 18);
+
+  // integrate
+  player.x += player.vx;
+  player.y += player.vy;
+
+  // collide
+  resolvePlatformCollisions();
+
+  // coin pickup
+  for(const c of world.coins){
+    if(c.taken) continue;
+    const dx = (player.x+player.w/2) - c.x;
+    const dy = (player.y+player.h/2) - c.y;
+    if(dx*dx + dy*dy < (c.r+18)*(c.r+18)){
+      c.taken = true;
+      // keep coin score tiny
+      state.score += 1;
+      updateHUD();
+    }
+  }
+
+  // quiz hit detect
+  checkHitQuizBlocks();
+
+  // camera follows
+  const target = Math.max(0, player.x - 220);
+  state.cameraX += (target - state.cameraX) * CAMERA_LERP;
+
+  // if fall, respawn near last safe point
+  if(player.y > SAFE_FALL_Y){
+    player.x = state.lastSafeX;
+    player.y = state.lastSafeY;
+    player.vx = 0;
+    player.vy = 0;
+  }
+
+  // checkpoint triggers (only in play phase)
+  if(state.phase === "play"){
+    for(const cp of world.checkpoints){
+      if(cp.used) continue;
+      if(player.x > cp.x){
+        cp.used = true;
+        if(triggerNextQuestion()){
+          topicBadge.textContent = "Question";
+        }
+        break;
+      }
+    }
+  }
+
+  // finish
+  if(player.x > LEVEL_END_X + 30){
+    endGame();
+  }
+}
+
+function tick(now){
+  physicsStep();
+  draw(now);
+  requestAnimationFrame(tick);
+}
+
+/* =========================
+   START / END / RESET
+   ========================= */
+function boot(hardReset=false){
+  state.running = false;
+  state.phase = "menu";
+  state.score = 0;
+  state.correct = 0;
+  state.attempted = 0;
+  state.log = [];
+  state.cameraX = 0;
+  state.lastSafeX = 80;
+  state.lastSafeY = 260;
+  state.popUntil = 0;
+
+  // reset world
+  const fresh = makeLevel();
+  world.platforms = fresh.platforms;
+  world.coins = fresh.coins;
+  world.checkpoints = fresh.checkpoints;
+  quizBlocks = [];
+
+  // reset player
+  player.x = 80; player.y = 260; player.vx = 0; player.vy = 0; player.onGround = false;
+
+  // questions
+  prepareQuestions();
+
+  updateHUD();
+  topicBadge.textContent = "Ready";
+  qTextEl.textContent = "Press Start to begin.";
+  choicesEl.innerHTML = "";
+  popupEl.style.display = "none";
+
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("startBtn").textContent = "Start";
+
+  if(hardReset){
+    try{ localStorage.removeItem("GBL_PLATFORMER_LAST_LOG"); }catch(e){}
+  }
+}
+
+function startGame(){
+  state.running = true;
+  state.phase = "play";
+  topicBadge.textContent = "Running";
+  qTextEl.textContent = "Run forward. Questions will appear at checkpoints.";
+  choicesEl.innerHTML = "";
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("startBtn").textContent = "Running…";
 }
 
 function endGame(){
   state.running = false;
-  const startBtn = document.getElementById("startBtn");
-  startBtn.disabled = false;
-  startBtn.textContent = "Start";
+  state.phase = "end";
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("startBtn").textContent = "Start";
 
   const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
-  document.getElementById("modalTitle").textContent = "Run Completed";
+
+  document.getElementById("modalTitle").textContent = "Level Completed";
   document.getElementById("modalBody").innerHTML = `
     <p><b>Score:</b> ${state.score} &nbsp; | &nbsp; <b>Accuracy:</b> ${acc}% &nbsp; | &nbsp; <b>Attempted:</b> ${state.attempted}</p>
-    <p class="muted">Download your attempt log as CSV.</p>
+    <p class="muted">Download your attempt log as CSV for analysis. (Coins add small points; MCQs drive the main score.)</p>
     <div class="row" style="justify-content:flex-start; margin-top:10px; gap:10px;">
       <button class="btn" id="dlBtn">Download CSV</button>
-      <button class="btn" id="reviewBtn">Review</button>
+      <button class="btn" id="reviewBtn">Review Questions</button>
     </div>
     <div id="reviewArea" style="display:none; margin-top:12px;"></div>
   `;
@@ -764,7 +1023,7 @@ function endGame(){
     };
   },0);
 
-  try{ localStorage.setItem("GBL_RUNNER_LAST_LOG", JSON.stringify(state.log)); }catch(e){}
+  try{ localStorage.setItem("GBL_PLATFORMER_LAST_LOG", JSON.stringify(state.log)); }catch(e){}
 }
 
 function renderReviewHTML(){
@@ -778,7 +1037,7 @@ function renderReviewHTML(){
           A: ${escapeHtml(q.A)}<br/>
           B: ${escapeHtml(q.B)}<br/>
           C: ${escapeHtml(q.C)}<br/>
-          <b>Correct:</b> ${q.correct} &nbsp; | &nbsp; <b>Your lane:</b> ${r.selected} &nbsp; | &nbsp;
+          <b>Correct:</b> ${q.correct} &nbsp; | &nbsp; <b>Your answer:</b> ${r.selected} &nbsp; | &nbsp;
           <b>${r.is_correct ? "Correct" : "Wrong"}</b>
           <br/><span class="muted">${escapeHtml(q.why)}</span>
         </div>
@@ -797,52 +1056,53 @@ function downloadCSV(){
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = "GBL_Runner_Log.csv";
+  a.href = url; a.download = "GBL_Platformer_Log.csv";
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 }
 
 /* =========================
-   MAIN LOOP
+   QUIZ TRIGGER: show first question once you start moving
    ========================= */
-function tick(now){
-  hidePopupIfNeeded(now);
-
-  if(state.running && scene.gates){
-    if(scene.phase === "reading"){
-      // hold gates during reading time
-      if(now - scene.phaseStart >= READ_DELAY_MS){
-        scene.phase = "moving";
-        scene.phaseStart = now;
-      }
-    } else if(scene.phase === "moving"){
-      // move gates slowly (readable)
-      scene.gates.x -= GATE_SPEED;
-
-      // allow early lock: if locked, slow down slightly (gives confidence)
-      if(state.locked) scene.gates.x -= 0.7;
-
-      // evaluate at collision point
-      const hitX = scene.runner.x + 54;
-      if(!scene.gates.done && scene.gates.x <= hitX){
-        scene.gates.done = true;
-        evaluate();
-      }
-
-      // after passing, clear and go next
-      if(scene.gates.x < -scene.gates.w - 50){
-        scene.gates = null;
-        scene.phase = "idle";
-        setTimeout(()=>{ if(state.running) nextQuestion(); }, 420);
-      }
-    }
-  }
-
-  drawScene(now);
-  requestAnimationFrame(tick);
+function prepareQuestions(){
+  // We will consume questions on checkpoint triggers.
+  const shuffled = shuffle(QUESTION_BANK);
+  state.questions = shuffled.slice(0, Math.min(QUESTIONS_PER_RUN, shuffled.length));
+  state.qIndex = 0;
+  qtotalEl.textContent = String(state.questions.length);
 }
 
-boot();
+function triggerNextQuestion(){
+  if(state.qIndex >= state.questions.length) return false;
+  const q = state.questions[state.qIndex++];
+  renderQuestion(q);
+  return true;
+}
+
+/* =========================
+   COMPLETE THE QUESTION FLOW
+   ========================= */
+function triggerNextQuestion(){
+  if(state.qIndex >= state.questions.length) return false;
+  const q = state.questions[state.qIndex++];
+  renderQuestion(q);
+  state.phase = "quiz";
+  spawnQuizBlocks(player.x);
+  return true;
+}
+
+/* =========================
+   HELPERS
+   ========================= */
+function aabb(a,b){ return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; }
+
+/* =========================
+   INIT
+   ========================= */
+overlay.style.display = "none";
+boot(false);
+fitCanvas();
+initStars();
 requestAnimationFrame(tick);
 </script>
 </body>
