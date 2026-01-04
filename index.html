@@ -2,14 +2,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>GBL Runner v5.1 — Option 2 Read-Pause + Smaller Blocks</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>GBL Runner — Commit Zone (Stable, Paper-Ready)</title>
   <style>
     :root{
       --bg:#071025;
       --ink:#eaf0ff;
       --muted:#b9c6ff;
+
       --panel:rgba(255,255,255,.08);
       --border:rgba(255,255,255,.14);
       --shadow:0 12px 34px rgba(0,0,0,.35);
@@ -20,6 +21,7 @@
       --a:#7c5cff;
       --b:#33d6ff;
       --c:#ff7ad9;
+      --zone:#ffd84d;
     }
     *{box-sizing:border-box}
     body{
@@ -31,7 +33,6 @@
         var(--bg);
       overflow:hidden;
     }
-
     .wrap{height:100dvh; display:flex; flex-direction:column;}
     header{
       padding:12px 14px 10px;
@@ -77,7 +78,7 @@
       padding:12px;
       backdrop-filter: blur(10px);
     }
-    .qCard{flex:1.2; min-height:150px; position:relative; overflow:hidden;}
+    .qCard{flex:1.2; min-height:160px; position:relative; overflow:hidden;}
     .qTitle{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;}
     .badge{
       font-size:12px;
@@ -137,6 +138,17 @@
       background:linear-gradient(90deg, rgba(51,214,255,.85), rgba(124,92,255,.85));
     }
 
+    .statusLine{
+      margin-top:10px;
+      padding:10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.10);
+      font-size:12px;
+      color:var(--muted);
+      display:none;
+    }
+
     .gameCard{flex:1.8; display:flex; flex-direction:column; gap:10px; padding:10px;}
     canvas{
       width:100%;
@@ -168,6 +180,7 @@
       min-height:56px;
     }
     .ctl small{font-weight:700; color:var(--muted); line-height:1.2;}
+
     .footerRow{
       display:flex; gap:10px; flex-wrap:wrap;
       justify-content:space-between; align-items:center;
@@ -195,6 +208,31 @@
     .pop.bad{background:rgba(255,92,122,.18)}
     .pop .why{display:block; margin-top:6px; font-size:12px; color:var(--muted); font-weight:750}
 
+    /* Commit buttons (only visible inside commit zone) */
+    .commitWrap{
+      position:absolute;
+      left:12px; right:12px; bottom:12px;
+      display:none;
+      gap:10px;
+      z-index:6;
+    }
+    .commitBtn{
+      flex:1;
+      border-radius:16px;
+      padding:14px 10px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.10);
+      box-shadow:var(--shadow);
+      font-weight:950;
+      color:var(--ink);
+      cursor:pointer;
+      user-select:none;
+    }
+    .commitBtn:active{transform:translateY(1px)}
+    .commitBtn.A{border-color:rgba(124,92,255,.55)}
+    .commitBtn.B{border-color:rgba(51,214,255,.55)}
+    .commitBtn.C{border-color:rgba(255,122,217,.55)}
+
     .overlay{
       position:fixed; inset:0;
       display:none;
@@ -220,6 +258,7 @@
       .row{flex-direction:column}
       canvas{height:min(52dvh, 480px);}
       .qText{font-size:15px}
+      .commitWrap{flex-direction:column}
     }
   </style>
 </head>
@@ -227,12 +266,11 @@
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="t">GBL Runner v5.1 — Option 2 (Read Pause + Progress Bar)</div>
-      <div class="s">Auto-freeze to read • Then A/B/C blocks spawn (smaller) with safe spacing • Low speed</div>
+      <div class="t">GBL Runner — Commit Zone Logic (Stable Selection)</div>
+      <div class="s">Read → Navigate → Enter Commit Zone → Explicitly select A/B/C (no physics-based selection)</div>
     </div>
     <div class="hud">
       <div class="pill">Score: <b id="score">0</b></div>
-      <div class="pill">Coins: <b id="coins">0</b></div>
       <div class="pill">Accuracy: <b id="acc">0%</b></div>
       <div class="pill">Q: <b id="qnum">0</b>/<span id="qtotal">0</span></div>
       <button class="btn" id="howBtn">How to Play</button>
@@ -245,7 +283,7 @@
       <section class="card qCard" aria-live="polite">
         <div class="qTitle">
           <div class="badge" id="topicBadge">Ready</div>
-          <div class="tiny muted">Read first, then options appear. Collide with correct; jump over wrong.</div>
+          <div class="tiny muted">Selection happens only in the Commit Zone. Use buttons or keys (1/2/3 or A/B/C).</div>
         </div>
         <div class="qText" id="qText">Press Start to begin.</div>
         <div class="choices" id="choices"></div>
@@ -258,6 +296,14 @@
           <div class="bar"><div id="readBar"></div></div>
         </div>
 
+        <div class="statusLine" id="statusLine"></div>
+
+        <div class="commitWrap" id="commitWrap">
+          <button class="commitBtn A" id="pickA">Select A</button>
+          <button class="commitBtn B" id="pickB">Select B</button>
+          <button class="commitBtn C" id="pickC">Select C</button>
+        </div>
+
         <div class="pop" id="popup"></div>
       </section>
 
@@ -265,13 +311,13 @@
         <canvas id="c"></canvas>
 
         <div class="controls">
-          <div class="ctl" id="leftBtn" role="button" tabindex="0">◀ Adjust <small>← / A</small></div>
+          <div class="ctl" id="leftBtn" role="button" tabindex="0">◀ Move <small>← / A</small></div>
           <div class="ctl" id="jumpBtn" role="button" tabindex="0">⤒ Jump <small>Space / ↑</small></div>
-          <div class="ctl" id="rightBtn" role="button" tabindex="0">Adjust ▶ <small>→ / D</small></div>
+          <div class="ctl" id="rightBtn" role="button" tabindex="0">Move ▶ <small>→ / D</small></div>
         </div>
 
         <div class="footerRow">
-          <div class="tiny">Tip: wait during read pause, then move/jump to reach the correct option block.</div>
+          <div class="tiny">Tip: options are markers only. Enter the yellow Commit Zone, then choose A/B/C.</div>
           <button class="btn" id="startBtn">Start</button>
         </div>
       </section>
@@ -284,12 +330,13 @@
     <h2 id="modalTitle">How to Play</h2>
     <div id="modalBody">
       <ul>
-        <li>When a question appears, the game <b>auto-freezes</b> for a few seconds so you can read.</li>
-        <li>After the timer ends, option blocks A/B/C spawn ahead (spaced).</li>
-        <li><b>Goal:</b> collide with the correct block. Jump over incorrect ones.</li>
-        <li>Jump: <b>Space</b> or <b>↑</b>. Mobile: Jump button. You can adjust left/right slightly.</li>
+        <li>When a question appears, the game <b>auto-pauses</b> for a few seconds so you can read.</li>
+        <li>Then the runner moves slowly. You will see option markers A/B/C ahead.</li>
+        <li>After the markers, you will see a <b>yellow Commit Zone</b>.</li>
+        <li>Enter the Commit Zone and <b>explicitly select</b> A/B/C using buttons (mobile) or keys (<b>1/2/3</b> or <b>A/B/C</b>).</li>
         <li>Correct = <b>+10</b>. Wrong = <b>0</b>. One attempt per question.</li>
       </ul>
+      <p class="muted">This design avoids accidental answers caused by jumping/landing physics.</p>
     </div>
     <div class="row">
       <button class="btn" id="closeModal">Close</button>
@@ -299,27 +346,54 @@
 
 <script>
 /* =========================================================
-   QUESTIONS (replace with your chapter-based)
+   QUESTIONS
+   Replace QUESTION_BANK with questions from your chapters.
+   IMPORTANT: Write the correct answer as "correctText"
+   (not fixed A/B/C), so we can shuffle options fairly.
    ========================================================= */
 const QUESTION_BANK = [
-  {id:"Q1",topic:"Mobile Security",q:"Safest place to install apps is:",
-   A:"Official app stores",B:"Random APK sites",C:"Unknown message links",correct:"A",
-   why:"Official stores reduce (not remove) malware risk."},
-  {id:"Q2",topic:"Android",q:"Why enable SIM lock?",
-   A:"PIN needed after restart",B:"Faster internet",C:"Auto updates",correct:"A",
-   why:"SIM lock blocks SIM use without the PIN after reboot."},
-  {id:"Q3",topic:"Permissions",q:"If an app asks unnecessary permissions:",
-   A:"Decline/uninstall",B:"Always accept",C:"Turn off screen lock",correct:"A",
-   why:"Unnecessary permissions can indicate data harvesting."},
-  {id:"Q4",topic:"Messaging",q:"SMS messages are generally:",
-   A:"Unencrypted",B:"End-to-end encrypted",C:"Encrypted by passcode",correct:"A",
-   why:"SMS can be vulnerable to interception."},
-  {id:"Q5",topic:"iOS",q:"iOS data protection is strongest with a:",
-   A:"Passcode",B:"Wallpaper",C:"Ringtone",correct:"A",
-   why:"Passcode enables iOS data protection features."},
-  {id:"Q6",topic:"Secure chat",q:"An encrypted messaging app is:",
-   A:"Signal",B:"Any SMS app",C:"Caller ID hide",correct:"A",
-   why:"Signal supports encrypted messages and calls."},
+  {
+    id:"Q1", topic:"Mobile Security",
+    q:"Safest place to install apps is:",
+    options:["Official app stores","Random APK sites","Unknown message links"],
+    correctText:"Official app stores",
+    why:"Official stores reduce (not remove) malware risk."
+  },
+  {
+    id:"Q2", topic:"Android",
+    q:"Why enable SIM lock?",
+    options:["PIN needed after restart","Faster internet","Auto updates"],
+    correctText:"PIN needed after restart",
+    why:"SIM lock blocks SIM use without the PIN after reboot."
+  },
+  {
+    id:"Q3", topic:"Permissions",
+    q:"If an app asks unnecessary permissions:",
+    options:["Decline/uninstall","Always accept","Turn off screen lock"],
+    correctText:"Decline/uninstall",
+    why:"Unnecessary permissions can indicate data harvesting."
+  },
+  {
+    id:"Q4", topic:"Messaging",
+    q:"SMS messages are generally:",
+    options:["Unencrypted","End-to-end encrypted","Encrypted by passcode"],
+    correctText:"Unencrypted",
+    why:"SMS can be vulnerable to interception."
+  },
+  {
+    id:"Q5", topic:"iOS",
+    q:"iOS data protection is strongest with a:",
+    options:["Passcode","Wallpaper","Ringtone"],
+    correctText:"Passcode",
+    why:"Passcode enables iOS data protection features."
+  },
+  {
+    id:"Q6", topic:"Secure chat",
+    q:"An encrypted messaging app is:",
+    options:["Signal","Any SMS app","Caller ID hide"],
+    correctText:"Signal",
+    why:"Signal supports encrypted messages and calls."
+  },
 ];
 
 /* =========================================================
@@ -345,7 +419,6 @@ function css(name){ return getComputedStyle(document.documentElement).getPropert
    UI refs
    ========================================================= */
 const scoreEl = document.getElementById("score");
-const coinsEl = document.getElementById("coins");
 const accEl   = document.getElementById("acc");
 const qnumEl  = document.getElementById("qnum");
 const qtotalEl= document.getElementById("qtotal");
@@ -354,13 +427,20 @@ const choicesEl = document.getElementById("choices");
 const topicBadge = document.getElementById("topicBadge");
 const popupEl = document.getElementById("popup");
 
-const overlay = document.getElementById("overlay");
-const modalTitle = document.getElementById("modalTitle");
-const modalBody  = document.getElementById("modalBody");
-
 const readWrap = document.getElementById("readWrap");
 const readBar  = document.getElementById("readBar");
 const readSecs = document.getElementById("readSecs");
+
+const statusLine = document.getElementById("statusLine");
+
+const commitWrap = document.getElementById("commitWrap");
+const pickA = document.getElementById("pickA");
+const pickB = document.getElementById("pickB");
+const pickC = document.getElementById("pickC");
+
+const overlay = document.getElementById("overlay");
+const modalTitle = document.getElementById("modalTitle");
+const modalBody  = document.getElementById("modalBody");
 
 document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
 document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
@@ -381,32 +461,27 @@ function fitCanvas(){
 window.addEventListener("resize", ()=>{ fitCanvas(); initSky(); resetPlayer(); });
 
 /* =========================================================
-   Game tuning (LOW SPEED + READ PAUSE OPTION 2)
+   Tuning (Commit Zone Strategy)
    ========================================================= */
-const READ_PAUSE_MS = 4500;   // increase reading time
-const RUN_SPEED = 1.7;        // low speed
+const READ_PAUSE_MS = 4500;       // guaranteed reading time
+const RUN_SPEED = 1.65;           // slow, comfortable
 const GRAVITY = 0.85;
 const JUMP_VEL = -14.0;
 const AIR_CONTROL = 0.20;
 const GROUND_CONTROL = 0.45;
 
-const QUESTION_TIMEOUT_MS = 15000;
+const QUESTION_TIMEOUT_MS = 17000; // overall question timeout (after read phase ends)
+const COMMIT_TIMEOUT_MS = 9000;    // once inside commit zone, time to select
 const FEEDBACK_MS = 950;
 
 const QUESTIONS_PER_RUN = 6;
 
-/* Smaller blocks + safe gaps */
-const BLOCK_W = 64;   // smaller
-const BLOCK_H = 40;   // smaller
-const GAP_PX  = 145;  // safe landing gap
-
-/* Collision behavior:
-   - We only count a choice if player hits the block's FRONT FACE (left strip).
-   - Landing on TOP of a block does NOT count as choosing it.
-*/
-const FACE_STRIP_W = 14;
-const FACE_PRE_PAD = 6;
-const TOP_IGNORE_PAD = 8;
+/* World layout for each question */
+const MARKER_SPREAD = 170;        // distance between A/B/C markers
+const MARKER_W = 64, MARKER_H = 38;
+const ZONE_W = 220;               // commit zone width
+const ZONE_GAP_AFTER_MARKERS = 170; // distance after last marker to commit zone
+const SAFE_LEAD_IN = 0.78;        // how far ahead to spawn sequence (relative to canvas width)
 
 /* =========================================================
    Responsive world
@@ -442,35 +517,43 @@ function initSky(){
    ========================================================= */
 const state = {
   running:false,
-  phase:"menu", // menu | run | question | feedback | end
+  phase:"menu", // menu | read | navigate | commit | feedback | end
   score:0,
-  coins:0,
   correct:0,
   attempted:0,
 
-  questions:[],
+  questions:[],        // prepared questions with balanced A/B/C distribution
   qIndex:0,
   current:null,
 
   cameraX:0,
   worldX:0,
 
+  // timings
   readStart:0,
   readUntil:0,
-  blocksSpawned:false,
+  decisionStart:0,      // time when read ends (start timing)
+  questionTimeoutAt:0,  // absolute time when question expires
 
-  questionStart:0,
-  answered:false,
+  // sequence elements in world space
+  markers:[],           // 3 markers A/B/C (non-interactive)
+  commitZone:null,      // commit zone rectangle
 
-  blocks:[],
+  // commit
+  inCommitZone:false,
+  commitUnlockAt:0,     // moment we entered commit zone
+  committed:false,
+
+  // fx
   floatPop:[],
   particles:[],
+
+  // logging
   log:[]
 };
 
 function updateHUD(){
   scoreEl.textContent = String(state.score);
-  coinsEl.textContent = String(state.coins);
   const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
   accEl.textContent = acc + "%";
   qnumEl.textContent = String(state.attempted);
@@ -509,10 +592,19 @@ const input = {left:false, right:false, jump:false};
 
 window.addEventListener("keydown",(e)=>{
   const k=e.code;
-  if(["ArrowLeft","ArrowRight","ArrowUp","Space","KeyA","KeyD"].includes(k)) e.preventDefault();
+  if(["ArrowLeft","ArrowRight","ArrowUp","Space","KeyA","KeyD","Digit1","Digit2","Digit3","KeyB","KeyC","Enter"].includes(k)) e.preventDefault();
+
+  // movement
   if(k==="ArrowLeft"||k==="KeyA") input.left=true;
   if(k==="ArrowRight"||k==="KeyD") input.right=true;
   if(k==="ArrowUp"||k==="Space") input.jump=true;
+
+  // commit selection keys (only active in commit phase)
+  if(state.phase === "commit" && state.inCommitZone && !state.committed){
+    if(k==="Digit1" || k==="KeyA") commitAnswer("A");
+    if(k==="Digit2" || k==="KeyB") commitAnswer("B");
+    if(k==="Digit3" || k==="KeyC") commitAnswer("C");
+  }
 });
 window.addEventListener("keyup",(e)=>{
   const k=e.code;
@@ -528,6 +620,73 @@ function bindHold(btn, onDown, onUp){
 bindHold(document.getElementById("leftBtn"), ()=>input.left=true, ()=>input.left=false);
 bindHold(document.getElementById("rightBtn"),()=>input.right=true,()=>input.right=false);
 document.getElementById("jumpBtn").addEventListener("pointerdown",(e)=>{ e.preventDefault(); input.jump=true; });
+
+// commit buttons
+pickA.onclick = ()=> commitAnswer("A");
+pickB.onclick = ()=> commitAnswer("B");
+pickC.onclick = ()=> commitAnswer("C");
+
+/* =========================================================
+   Question preparation: shuffle options + balance correct letters
+   ========================================================= */
+function prepareQuestionsBalanced(){
+  // sample questions
+  const selected = shuffle(QUESTION_BANK).slice(0, Math.min(QUESTIONS_PER_RUN, QUESTION_BANK.length));
+
+  // target distribution A/B/C close to equal
+  const n = selected.length;
+  const targets = {A:0, B:0, C:0};
+  // simple equal split, remainder assigned randomly
+  const base = Math.floor(n/3);
+  targets.A = base; targets.B = base; targets.C = base;
+  let rem = n - 3*base;
+  const letters = shuffle(["A","B","C"]);
+  for(let i=0;i<rem;i++) targets[letters[i]]++;
+
+  const used = {A:0, B:0, C:0};
+
+  const prepared = selected.map((qObj, idx) => {
+    const opts = qObj.options.slice();
+    // shuffle options a few times until we can assign desired correct letter
+    let best = null;
+
+    for(let tries=0; tries<50; tries++){
+      const sh = shuffle(opts);
+
+      // map to A/B/C
+      const map = {A:sh[0], B:sh[1], C:sh[2]};
+
+      // compute correct letter
+      const correctLetter = (map.A === qObj.correctText) ? "A"
+                           : (map.B === qObj.correctText) ? "B"
+                           : "C";
+
+      // choose if we still need this letter according to targets
+      if(used[correctLetter] < targets[correctLetter]){
+        best = {map, correctLetter, shown: sh};
+        break;
+      }
+      // otherwise keep a fallback
+      if(!best) best = {map, correctLetter, shown: sh};
+    }
+
+    used[best.correctLetter]++;
+
+    return {
+      id: qObj.id,
+      topic: qObj.topic,
+      q: qObj.q,
+      A: best.map.A,
+      B: best.map.B,
+      C: best.map.C,
+      correct: best.correctLetter,
+      correctText: qObj.correctText,
+      why: qObj.why
+    };
+  });
+
+  return prepared;
+}
 
 /* =========================================================
    Question UI
@@ -551,25 +710,160 @@ function showPopup(ok, correctKey, why){
   setTimeout(()=> popupEl.style.display="none", FEEDBACK_MS);
 }
 
-/* =========================================================
-   Blocks: smaller and spaced
-   ========================================================= */
-function spawnOptionBlocks(){
-  const m = getWorldMetrics();
-  const spawnWorldX = state.worldX + Math.round(m.W*0.78);
-  const y = m.groundY - BLOCK_H;
-
-  state.blocks = [
-    makeBlock("A", spawnWorldX + 0*(BLOCK_W+GAP_PX), y, BLOCK_W, BLOCK_H),
-    makeBlock("B", spawnWorldX + 1*(BLOCK_W+GAP_PX), y, BLOCK_W, BLOCK_H),
-    makeBlock("C", spawnWorldX + 2*(BLOCK_W+GAP_PX), y, BLOCK_W, BLOCK_H),
-  ];
-  state.blocksSpawned = true;
+function setStatus(text, show=true){
+  statusLine.textContent = text;
+  statusLine.style.display = show ? "block" : "none";
 }
 
-function makeBlock(key, x, y, w, h){
-  const color = key==="A" ? css("--a") : key==="B" ? css("--b") : css("--c");
-  return {key, x, y, w, h, color, hit:false, bounceUntil:0};
+/* =========================================================
+   World sequence for each question
+   Markers (A/B/C) are visual only.
+   Commit Zone is neutral gate used to unlock selection.
+   ========================================================= */
+function buildSequenceForQuestion(){
+  const m = getWorldMetrics();
+  const baseX = state.worldX + Math.round(m.W * SAFE_LEAD_IN);
+
+  const y = m.groundY - MARKER_H;
+
+  state.markers = [
+    {key:"A", x: baseX + 0*MARKER_SPREAD, y, w:MARKER_W, h:MARKER_H},
+    {key:"B", x: baseX + 1*MARKER_SPREAD, y, w:MARKER_W, h:MARKER_H},
+    {key:"C", x: baseX + 2*MARKER_SPREAD, y, w:MARKER_W, h:MARKER_H},
+  ];
+
+  const last = state.markers[state.markers.length-1];
+  const zoneX = last.x + last.w + ZONE_GAP_AFTER_MARKERS;
+  const zoneY = m.groundY - 64;
+
+  state.commitZone = {
+    x: zoneX,
+    y: zoneY,
+    w: ZONE_W,
+    h: 64
+  };
+}
+
+/* =========================================================
+   Commit Zone handling
+   ========================================================= */
+function playerWorldRect(){
+  const pwx = state.worldX + player.x;
+  return {x:pwx, y:player.y, w:player.w, h:player.h};
+}
+function rectOverlap(a,b){
+  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+}
+
+function updateCommitZone(now){
+  if(state.phase !== "navigate" && state.phase !== "commit") return;
+  if(!state.commitZone) return;
+
+  const pr = playerWorldRect();
+  const inZone = rectOverlap(pr, state.commitZone);
+
+  if(inZone && !state.inCommitZone){
+    state.inCommitZone = true;
+    state.phase = "commit";
+    state.commitUnlockAt = now;
+    commitWrap.style.display = "flex";
+    setStatus("You are in the COMMIT ZONE. Select A/B/C now (keys 1/2/3 or A/B/C).", true);
+
+    // auto-timeout inside commit zone
+    setTimeout(()=>{
+      if(state.phase === "commit" && state.inCommitZone && !state.committed){
+        noAnswer("No selection in Commit Zone.");
+      }
+    }, COMMIT_TIMEOUT_MS);
+  }
+
+  // if learner leaves commit zone without committing, keep them in commit phase but hide buttons
+  // (They must re-enter zone to select.)
+  if(!inZone && state.inCommitZone && !state.committed){
+    state.inCommitZone = false;
+    commitWrap.style.display = "none";
+    setStatus("Move back into the yellow COMMIT ZONE to select A/B/C.", true);
+  }
+
+  // if committed, hide UI
+  if(state.committed){
+    commitWrap.style.display = "none";
+  }
+}
+
+function commitAnswer(letter){
+  if(state.phase !== "commit") return;
+  if(!state.inCommitZone) return;
+  if(state.committed) return;
+
+  state.committed = true;
+
+  const q = state.current;
+  const ok = (letter === q.correct);
+
+  state.attempted++;
+  if(ok){
+    state.correct++;
+    state.score += 10;
+    addFloatPop(state.worldX + player.x + player.w/2, player.y - 14, "+10", "rgba(57,217,138,.95)", 700);
+    addBurst(state.worldX + player.x + player.w/2, player.y + 10, "rgba(57,217,138,.95)");
+  }else{
+    addFloatPop(state.worldX + player.x + player.w/2, player.y - 14, "0", "rgba(255,255,255,.85)", 650);
+    addBurst(state.worldX + player.x + player.w/2, player.y + 10, "rgba(255,92,122,.95)");
+  }
+
+  // response time measured from end of read phase
+  const rt = Math.max(0, Math.round(performance.now() - state.decisionStart));
+
+  state.log.push({
+    ts: new Date().toISOString(),
+    qid: q.id,
+    topic: q.topic,
+    option_order: `A:${q.A} | B:${q.B} | C:${q.C}`,
+    selected: letter,
+    correct: q.correct,
+    is_correct: ok ? 1 : 0,
+    response_ms: rt,
+    score_after: state.score
+  });
+
+  updateHUD();
+  showPopup(ok, q.correct, q.why);
+
+  setStatus("Feedback shown. Next question loading…", true);
+
+  state.phase = "feedback";
+  setTimeout(()=> nextQuestion(), FEEDBACK_MS);
+}
+
+function noAnswer(reason){
+  if(state.phase === "feedback") return;
+  if(state.committed) return;
+
+  state.committed = true; // lock
+  state.attempted++;
+  updateHUD();
+
+  const q = state.current;
+  const rt = Math.max(0, Math.round(performance.now() - state.decisionStart));
+
+  state.log.push({
+    ts: new Date().toISOString(),
+    qid: q.id,
+    topic: q.topic,
+    option_order: `A:${q.A} | B:${q.B} | C:${q.C}`,
+    selected: "NA",
+    correct: q.correct,
+    is_correct: 0,
+    response_ms: rt,
+    score_after: state.score
+  });
+
+  showPopup(false, q.correct, reason || "No answer recorded.");
+  setStatus("No answer. Next question loading…", true);
+
+  state.phase = "feedback";
+  setTimeout(()=> nextQuestion(), FEEDBACK_MS);
 }
 
 /* =========================================================
@@ -595,161 +889,7 @@ function addBurst(worldX, y, color){
 }
 
 /* =========================================================
-   Collision: FRONT FACE ONLY
-   - If player lands on top of a block, ignore (not a choice).
-   ========================================================= */
-function overlap(a,b){
-  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
-}
-
-function checkBlockCollisions(now){
-  if(state.phase !== "question") return;
-  if(state.answered) return;
-  if(!state.blocks.length) return;
-
-  // movement allowed only after read pause ends (prevents early collision)
-  const canChoose = (now >= state.readUntil);
-
-  const playerWorldX = state.worldX + player.x;
-  const pr = {x: playerWorldX, y: player.y, w: player.w, h: player.h};
-  const feetY = pr.y + pr.h;
-
-  for(const b of state.blocks){
-    if(b.hit) continue;
-
-    // If the player's feet are above the top of the block -> landing on top (ignore)
-    if(feetY <= b.y + TOP_IGNORE_PAD) continue;
-
-    // Front face strip (left side of block)
-    const face = {
-      x: b.x - FACE_PRE_PAD,
-      y: b.y + 6,
-      w: FACE_STRIP_W,
-      h: b.h - 12
-    };
-
-    if(canChoose && overlap(pr, face)){
-      b.hit = true;
-      b.bounceUntil = now + 180;
-      handleAnswer(b.key);
-      break;
-    }
-  }
-}
-
-/* =========================================================
-   Answer flow
-   ========================================================= */
-function handleAnswer(selectedKey){
-  const q = state.current;
-  const ok = (selectedKey === q.correct);
-
-  state.attempted++;
-  if(ok){
-    state.correct++;
-    state.score += 10;
-    addFloatPop(state.worldX + player.x + player.w/2, player.y - 14, "+10", "rgba(57,217,138,.95)", 700);
-    addBurst(state.worldX + player.x + player.w/2, player.y + 10, "rgba(57,217,138,.95)");
-  }else{
-    addFloatPop(state.worldX + player.x + player.w/2, player.y - 14, "0", "rgba(255,255,255,.85)", 650);
-    addBurst(state.worldX + player.x + player.w/2, player.y + 10, "rgba(255,92,122,.95)");
-  }
-
-  updateHUD();
-  showPopup(ok, q.correct, q.why);
-
-  const rt = Math.max(0, Math.round(performance.now() - state.questionStart));
-  state.log.push({
-    ts: new Date().toISOString(),
-    qid: q.id,
-    topic: q.topic,
-    selected: selectedKey,
-    correct: q.correct,
-    is_correct: ok ? 1 : 0,
-    response_ms: rt,
-    score_after: state.score
-  });
-
-  state.answered = true;
-  state.phase = "feedback";
-
-  setTimeout(()=> nextQuestion(), FEEDBACK_MS);
-}
-
-function autoNoAnswer(){
-  if(state.phase !== "question") return;
-  if(state.answered) return;
-
-  const q = state.current;
-  state.attempted++;
-  updateHUD();
-  showPopup(false, q.correct, "No answer recorded.");
-
-  state.log.push({
-    ts: new Date().toISOString(),
-    qid: q.id,
-    topic: q.topic,
-    selected: "NA",
-    correct: q.correct,
-    is_correct: 0,
-    response_ms: QUESTION_TIMEOUT_MS,
-    score_after: state.score
-  });
-
-  state.phase = "feedback";
-  state.answered = true;
-  setTimeout(()=> nextQuestion(), FEEDBACK_MS);
-}
-
-function startQuestion(){
-  if(state.qIndex >= state.questions.length){
-    endGame();
-    return;
-  }
-  const q = state.questions[state.qIndex++];
-  renderQuestion(q);
-
-  state.phase = "question";
-  topicBadge.textContent = "Question";
-  state.blocks = [];
-  state.blocksSpawned = false;
-  state.answered = false;
-
-  // Read pause (Option 2): freeze motion, show progress bar
-  const now = performance.now();
-  state.readStart = now;
-  state.readUntil = now + READ_PAUSE_MS;
-  state.questionStart = now;
-
-  readWrap.style.display = "block";
-  readBar.style.width = "0%";
-  readSecs.textContent = (READ_PAUSE_MS/1000).toFixed(1) + "s";
-
-  // Spawn blocks after read pause ends
-  setTimeout(()=>{
-    if(state.phase === "question" && !state.answered){
-      spawnOptionBlocks();
-      // hide read bar when options appear
-      readWrap.style.display = "none";
-    }
-  }, READ_PAUSE_MS);
-
-  // Timeout
-  setTimeout(()=> autoNoAnswer(), QUESTION_TIMEOUT_MS);
-}
-
-function nextQuestion(){
-  popupEl.style.display="none";
-  state.blocks = [];
-  state.phase = "run";
-  topicBadge.textContent = "Running";
-  readWrap.style.display = "none";
-
-  setTimeout(()=> startQuestion(), 650);
-}
-
-/* =========================================================
-   Drawing
+   Drawing helpers
    ========================================================= */
 function roundRect(x,y,w,h,r){
   ctx.beginPath();
@@ -806,9 +946,7 @@ function drawGround(W, groundY, thick){
 }
 
 function drawPlayer(now){
-  // clearer helmet+torso silhouette
   player.t += 0.12 + Math.min(0.20, Math.abs(player.vx)*0.08);
-
   const x = player.x, y = player.y, w = player.w, h = player.h;
 
   // shadow
@@ -891,40 +1029,73 @@ function drawPlayer(now){
   ctx.stroke();
 }
 
-function drawBlocks(now){
-  for(const b of state.blocks){
-    const bounce = (b.bounceUntil > now) ? Math.sin((1 - (b.bounceUntil - now)/180)*Math.PI)*8 : 0;
-    const sx = b.x - state.cameraX;
-    const sy = b.y - bounce;
+function drawMarkers(){
+  const cam = state.cameraX;
 
-    // glow
-    ctx.globalAlpha = 0.16;
-    ctx.fillStyle = b.color;
-    roundRect(sx-6, sy-6, b.w+12, b.h+12, 14);
+  for(const mk of state.markers){
+    const sx = mk.x - cam;
+    const sy = mk.y;
+
+    // identical look for all markers (no hint)
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = "rgba(255,255,255,.45)";
+    roundRect(sx-6, sy-6, mk.w+12, mk.h+12, 14);
     ctx.fill();
     ctx.globalAlpha = 1;
 
-    // body
-    const grad = ctx.createLinearGradient(sx,sy,sx,sy+b.h);
-    grad.addColorStop(0, b.color);
-    grad.addColorStop(1, "rgba(0,0,0,.10)");
+    const grad = ctx.createLinearGradient(sx,sy,sx,sy+mk.h);
+    grad.addColorStop(0, "rgba(255,255,255,.16)");
+    grad.addColorStop(1, "rgba(0,0,0,.18)");
     ctx.fillStyle = grad;
-    roundRect(sx, sy, b.w, b.h, 12);
+    roundRect(sx, sy, mk.w, mk.h, 12);
     ctx.fill();
 
-    // bevel
     ctx.globalAlpha = 0.55;
     ctx.strokeStyle = "rgba(255,255,255,.55)";
     ctx.lineWidth = 2;
-    roundRect(sx+3, sy+3, b.w-6, b.h-6, 10);
+    roundRect(sx+3, sy+3, mk.w-6, mk.h-6, 10);
     ctx.stroke();
     ctx.globalAlpha = 1;
 
     // label
-    ctx.fillStyle = "rgba(7,16,37,.92)";
-    ctx.font = "950 20px system-ui,Segoe UI,Arial";
-    ctx.fillText(b.key, sx + b.w/2 - 7, sy + b.h/2 + 7);
+    ctx.fillStyle = "rgba(234,240,255,.95)";
+    ctx.font = "950 18px system-ui,Segoe UI,Arial";
+    ctx.fillText(mk.key, sx + mk.w/2 - 6, sy + mk.h/2 + 6);
   }
+}
+
+function drawCommitZone(now){
+  if(!state.commitZone) return;
+  const cam = state.cameraX;
+  const z = state.commitZone;
+  const sx = z.x - cam, sy = z.y;
+
+  // pulsing glow
+  const pulse = 0.35 + 0.25*Math.sin(now/220);
+  ctx.globalAlpha = pulse;
+  ctx.fillStyle = "rgba(255,216,77,.55)";
+  roundRect(sx-8, sy-8, z.w+16, z.h+16, 16);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // zone body
+  const g = ctx.createLinearGradient(sx,sy,sx,sy+z.h);
+  g.addColorStop(0, "rgba(255,216,77,.38)");
+  g.addColorStop(1, "rgba(0,0,0,.14)");
+  ctx.fillStyle = g;
+  roundRect(sx, sy, z.w, z.h, 14);
+  ctx.fill();
+
+  ctx.strokeStyle = "rgba(255,216,77,.90)";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6,6]);
+  roundRect(sx+2, sy+2, z.w-4, z.h-4, 12);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = "rgba(7,16,37,.92)";
+  ctx.font = "950 12px system-ui,Segoe UI,Arial";
+  ctx.fillText("COMMIT ZONE", sx + 14, sy + z.h/2 + 4);
 }
 
 function drawFloatPops(now){
@@ -960,16 +1131,19 @@ function drawParticles(now){
 }
 
 function drawHint(now, W, H){
-  if(state.phase === "question"){
-    ctx.fillStyle = "rgba(255,255,255,.10)";
-    ctx.fillRect(0, H-40, W, 40);
-    ctx.fillStyle = "rgba(234,240,255,.92)";
-    ctx.font = "900 12px system-ui,Segoe UI,Arial";
-    if(now < state.readUntil){
-      ctx.fillText("Reading time… options will appear soon.", 12, H-16);
-    }else{
-      ctx.fillText("Now answer: collide with correct block A/B/C. Jump over wrong ones.", 12, H-16);
-    }
+  ctx.fillStyle = "rgba(255,255,255,.08)";
+  ctx.fillRect(0, H-40, W, 40);
+  ctx.fillStyle = "rgba(234,240,255,.92)";
+  ctx.font = "900 12px system-ui,Segoe UI,Arial";
+
+  if(state.phase === "read"){
+    ctx.fillText("Reading time… (movement disabled)", 12, H-16);
+  }else if(state.phase === "navigate"){
+    ctx.fillText("Navigate to the yellow COMMIT ZONE to select A/B/C.", 12, H-16);
+  }else if(state.phase === "commit"){
+    ctx.fillText("You are in COMMIT ZONE. Choose A/B/C now (buttons or 1/2/3).", 12, H-16);
+  }else{
+    ctx.fillText("Runner is for engagement. Selection is explicit in Commit Zone.", 12, H-16);
   }
 }
 
@@ -981,16 +1155,16 @@ function draw(now){
   drawSky(now, W, H);
   drawGround(W, m.groundY, m.groundThickness);
 
-  drawBlocks(now);
+  drawMarkers();
+  drawCommitZone(now);
   drawParticles(now);
   drawFloatPops(now);
   drawPlayer(now);
-
   drawHint(now, W, H);
 }
 
 /* =========================================================
-   Step
+   Step (physics + phases)
    ========================================================= */
 function step(now){
   if(!state.running) return;
@@ -998,32 +1172,45 @@ function step(now){
   const m = getWorldMetrics();
   const groundY = m.groundY;
 
-  // reading freeze
-  const inReadPause = (state.phase === "question" && now < state.readUntil);
-
-  // progress bar update
-  if(state.phase === "question" && readWrap.style.display === "block"){
+  // read bar progress
+  if(state.phase === "read"){
     const total = state.readUntil - state.readStart;
     const done = clamp(now - state.readStart, 0, total);
     const pct = total > 0 ? (done/total)*100 : 100;
     readBar.style.width = pct.toFixed(1) + "%";
     readSecs.textContent = Math.max(0, (total - done)/1000).toFixed(1) + "s";
+
+    // end read phase
+    if(now >= state.readUntil){
+      readWrap.style.display = "none";
+      state.phase = "navigate";
+      state.decisionStart = performance.now();
+      state.questionTimeoutAt = state.decisionStart + QUESTION_TIMEOUT_MS;
+      setStatus("Navigate forward to the yellow COMMIT ZONE. Options shown are A/B/C.", true);
+    }
   }
 
-  // forward motion
-  const forward = (!inReadPause && (state.phase === "run" || state.phase === "question")) ? RUN_SPEED : 0;
+  // question overall timeout (after read ends)
+  if((state.phase === "navigate" || state.phase === "commit") && !state.committed){
+    if(performance.now() >= state.questionTimeoutAt){
+      noAnswer("Time expired.");
+    }
+  }
+
+  const inReadPause = (state.phase === "read" || state.phase === "feedback" || state.phase === "end");
+  const forward = (!inReadPause && (state.phase === "navigate" || state.phase === "commit")) ? RUN_SPEED : 0;
   state.worldX += forward;
 
-  // lateral adjustment
+  // lateral control (disabled during read to avoid distraction)
   const ctl = player.onGround ? GROUND_CONTROL : AIR_CONTROL;
-  if(!inReadPause){ // avoid distraction: no movement during read pause
+  if(!inReadPause){
     if(input.left)  player.vx -= ctl;
     if(input.right) player.vx += ctl;
   }
   player.vx *= 0.88;
   player.vx = clamp(player.vx, -3.0, 3.0);
 
-  // jump (disabled during read pause)
+  // jump (disabled during read/feedback)
   if(input.jump){
     input.jump = false;
     if(!inReadPause && player.onGround){
@@ -1041,7 +1228,7 @@ function step(now){
   player.x += player.vx;
   player.y += player.vy;
 
-  // keep player visible
+  // keep player visible (screen-space)
   player.x = clamp(player.x, 24, m.W - player.w - 24);
 
   // ground collision
@@ -1052,79 +1239,79 @@ function step(now){
     player.onGround = true;
   }
 
-  // camera maps world to screen
+  // camera
   state.cameraX = state.worldX;
 
-  // collision with blocks
-  checkBlockCollisions(now);
-
-  // if blocks exist and player passes last without choosing -> NA
-  if(state.phase === "question" && state.blocks.length && !state.answered){
-    const last = state.blocks[state.blocks.length-1];
-    const playerWorldX = state.worldX + player.x;
-    if(playerWorldX > last.x + last.w + 80){
-      autoNoAnswer();
-    }
-  }
+  // commit zone checks
+  updateCommitZone(now);
 }
 
 /* =========================================================
-   Start/end/reset
+   Question flow
    ========================================================= */
-function prepareQuestions(){
-  state.questions = shuffle(QUESTION_BANK).slice(0, Math.min(QUESTIONS_PER_RUN, QUESTION_BANK.length));
-  state.qIndex = 0;
-  qtotalEl.textContent = String(state.questions.length);
+function startQuestion(){
+  if(state.qIndex >= state.questions.length){
+    endGame();
+    return;
+  }
+
+  // reset per-question
+  state.markers = [];
+  state.commitZone = null;
+  state.inCommitZone = false;
+  state.commitUnlockAt = 0;
+  state.committed = false;
+  commitWrap.style.display = "none";
+  setStatus("", false);
+
+  const q = state.questions[state.qIndex++];
+  renderQuestion(q);
+
+  // build world elements for this question
+  buildSequenceForQuestion();
+
+  // enter read phase
+  state.phase = "read";
+  state.readStart = performance.now();
+  state.readUntil = state.readStart + READ_PAUSE_MS;
+
+  readWrap.style.display = "block";
+  readBar.style.width = "0%";
+  readSecs.textContent = (READ_PAUSE_MS/1000).toFixed(1) + "s";
 }
-function boot(){
-  state.running = false;
-  state.phase = "menu";
-  state.score = 0;
-  state.coins = 0;
-  state.correct = 0;
-  state.attempted = 0;
 
-  state.qIndex = 0;
-  state.current = null;
+function nextQuestion(){
+  popupEl.style.display="none";
+  setStatus("", false);
 
-  state.cameraX = 0;
-  state.worldX = 0;
-
-  state.readStart = 0;
-  state.readUntil = 0;
-  state.blocksSpawned = false;
-
-  state.questionStart = 0;
-  state.answered = false;
-
-  state.blocks = [];
-  state.floatPop = [];
-  state.particles = [];
-  state.log = [];
-
-  popupEl.style.display = "none";
-  readWrap.style.display = "none";
-
-  topicBadge.textContent = "Ready";
-  qTextEl.textContent = "Press Start to begin.";
-  choicesEl.innerHTML = "";
-
-  prepareQuestions();
-  updateHUD();
-  resetPlayer();
-}
-function startGame(){
-  overlay.style.display = "none";
-  state.running = true;
-  state.phase = "run";
-  topicBadge.textContent = "Running";
-  qTextEl.textContent = "Get ready. First question starts now.";
-  choicesEl.innerHTML = "";
+  // small separation
   setTimeout(()=> startQuestion(), 650);
 }
+
+/* =========================================================
+   End + CSV
+   ========================================================= */
+function downloadCSV(){
+  const rows = [["ts","qid","topic","option_order","selected","correct","is_correct","response_ms","score_after"]];
+  for(const r of state.log){
+    rows.push([r.ts,r.qid,r.topic,r.option_order,r.selected,r.correct,r.is_correct,r.response_ms,r.score_after]);
+  }
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download="GBL_CommitZone_Log.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
 function endGame(){
   state.running = false;
   state.phase = "end";
+  commitWrap.style.display = "none";
+  readWrap.style.display = "none";
+  setStatus("", false);
+
   const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
   modalTitle.textContent = "Run Completed";
   modalBody.innerHTML = `
@@ -1137,18 +1324,57 @@ function endGame(){
   overlay.style.display = "flex";
   setTimeout(()=> document.getElementById("dlBtn").onclick = downloadCSV, 0);
 }
-function downloadCSV(){
-  const rows = [["ts","qid","topic","selected","correct","is_correct","response_ms","score_after"]];
-  for(const r of state.log){
-    rows.push([r.ts,r.qid,r.topic,r.selected,r.correct,r.is_correct,r.response_ms,r.score_after]);
-  }
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href=url; a.download="GBL_Runner_v5_1_Log.csv";
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+
+/* =========================================================
+   Boot / Start
+   ========================================================= */
+function boot(){
+  state.running = false;
+  state.phase = "menu";
+
+  state.score = 0;
+  state.correct = 0;
+  state.attempted = 0;
+
+  state.questions = prepareQuestionsBalanced();
+  state.qIndex = 0;
+
+  state.cameraX = 0;
+  state.worldX = 0;
+
+  state.markers = [];
+  state.commitZone = null;
+
+  state.floatPop = [];
+  state.particles = [];
+  state.log = [];
+
+  popupEl.style.display = "none";
+  readWrap.style.display = "none";
+  commitWrap.style.display = "none";
+  setStatus("", false);
+
+  topicBadge.textContent = "Ready";
+  qTextEl.textContent = "Press Start to begin.";
+  choicesEl.innerHTML = "";
+
+  qtotalEl.textContent = String(state.questions.length);
+  updateHUD();
+  resetPlayer();
+}
+
+function startGame(){
+  overlay.style.display = "none";
+  state.running = true;
+
+  topicBadge.textContent = "Starting";
+  setStatus("Starting…", true);
+
+  // short warm-up then first question
+  setTimeout(()=>{
+    setStatus("", false);
+    startQuestion();
+  }, 650);
 }
 
 /* =========================================================
