@@ -3,24 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>GBL Mario-Style Platformer — Mobile Security Quiz</title>
+  <title>GBL Mario-Style Platformer v2 — Mobile Security Quiz</title>
   <style>
     :root{
-      --bg:#0b1220;
-      --panel:rgba(255,255,255,.08);
-      --border:rgba(255,255,255,.14);
+      --bg:#081022;
       --ink:#eaf0ff;
       --muted:#b9c6ff;
+      --panel:rgba(255,255,255,.08);
+      --border:rgba(255,255,255,.14);
+      --shadow:0 12px 34px rgba(0,0,0,.35);
+
       --good:#39d98a;
       --bad:#ff5c7a;
+
       --a:#7c5cff;
       --b:#33d6ff;
       --c:#ff7ad9;
-      --shadow:0 12px 34px rgba(0,0,0,.35);
+
+      --tile:rgba(255,255,255,.14);
+      --tile2:rgba(100,181,255,.12);
     }
+
     *{box-sizing:border-box}
     body{
-      margin:0; color:var(--ink);
+      margin:0;
+      color:var(--ink);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:
         radial-gradient(1000px 450px at 70% 10%, rgba(100,181,255,.18), transparent 55%),
@@ -28,6 +35,7 @@
         var(--bg);
       overflow:hidden;
     }
+
     .wrap{height:100dvh; display:flex; flex-direction:column;}
     header{
       padding:12px 14px 10px;
@@ -61,6 +69,7 @@
       transition: transform .05s ease;
     }
     .btn:active{transform:translateY(1px)}
+
     main{flex:1; padding:0 12px 12px; display:flex; flex-direction:column; gap:10px;}
     .row{display:flex; gap:10px; align-items:stretch;}
     .card{
@@ -71,8 +80,12 @@
       padding:12px;
       backdrop-filter: blur(10px);
     }
-    .qCard{flex:1.2; min-height:140px; position:relative; overflow:hidden;}
-    .qTitle{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
+
+    .qCard{flex:1.2; min-height:150px; position:relative; overflow:hidden;}
+    .qTitle{
+      display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;
+      margin-bottom:6px;
+    }
     .badge{
       font-size:12px;
       padding:6px 10px;
@@ -81,7 +94,12 @@
       border:1px solid rgba(100,181,255,.35);
       white-space:nowrap;
     }
-    .qText{margin-top:8px; font-size:16px; line-height:1.28; font-weight:900;}
+    .qText{
+      font-size:16px;
+      line-height:1.28;
+      font-weight:900;
+      margin-top:6px;
+    }
     .choices{margin-top:10px; display:grid; gap:6px;}
     .choice{
       display:flex; gap:10px; align-items:center;
@@ -95,21 +113,24 @@
       width:30px; height:30px; border-radius:10px;
       display:grid; place-items:center;
       font-weight:950; color:#0b1220;
+      flex:0 0 auto;
     }
     .tag.A{background:var(--a)}
     .tag.B{background:var(--b)}
     .tag.C{background:var(--c)}
     .muted{color:var(--muted)}
+
     .gameCard{flex:1.8; display:flex; flex-direction:column; gap:10px; padding:10px;}
     canvas{
       width:100%;
-      height:min(56dvh, 540px);
+      height:min(56dvh, 560px);
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));
       box-shadow:var(--shadow);
       touch-action:none;
     }
+
     .controls{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -118,7 +139,7 @@
     }
     .ctl{
       border-radius:16px;
-      padding:12px 10px;
+      padding:14px 10px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.08);
       box-shadow:var(--shadow);
@@ -127,9 +148,15 @@
       align-items:center;
       font-weight:950;
       text-align:center;
+      min-height:56px;
     }
     .ctl small{font-weight:700; color:var(--muted); line-height:1.2;}
-    .footerRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; padding:2px 2px 0;}
+
+    .footerRow{
+      display:flex; gap:10px; flex-wrap:wrap;
+      justify-content:space-between; align-items:center;
+      padding:2px 2px 0;
+    }
     .tiny{font-size:12px; color:var(--muted)}
 
     .pop{
@@ -145,11 +172,11 @@
       box-shadow:var(--shadow);
       backdrop-filter: blur(8px);
       text-align:center;
-      min-width:280px;
+      min-width:300px;
     }
     .pop.good{background:rgba(57,217,138,.20)}
     .pop.bad{background:rgba(255,92,122,.18)}
-    .pop .why{display:block; margin-top:6px; font-size:12px; color:var(--muted); font-weight:700}
+    .pop .why{display:block; margin-top:6px; font-size:12px; color:var(--muted); font-weight:750}
 
     .overlay{
       position:fixed; inset:0;
@@ -161,7 +188,7 @@
       z-index:50;
     }
     .modal{
-      width:min(820px, 96vw);
+      width:min(840px, 96vw);
       background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
       border:1px solid rgba(255,255,255,.14);
       border-radius:22px;
@@ -174,7 +201,8 @@
 
     @media (max-width: 900px){
       .row{flex-direction:column}
-      canvas{height:min(52dvh, 460px);}
+      canvas{height:min(52dvh, 480px);}
+      .qText{font-size:15px}
     }
   </style>
 </head>
@@ -182,8 +210,8 @@
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="t">GBL Platformer — Mario-Style (Educational)</div>
-      <div class="s">Run & Jump • Hit A/B/C blocks to answer • Works on mobile + desktop</div>
+      <div class="t">GBL Platformer v2 — Mario-Style (Educational)</div>
+      <div class="s">Move + Jump • When question appears, jump to hit A/B/C brick • Quiz pauses the run</div>
     </div>
     <div class="hud">
       <div class="pill">Score: <b id="score">0</b></div>
@@ -199,7 +227,7 @@
       <section class="card qCard" aria-live="polite">
         <div class="qTitle">
           <div class="badge" id="topicBadge">Ready</div>
-          <div class="tiny muted" id="hint">Tip: When question appears, jump and hit the A/B/C block.</div>
+          <div class="tiny muted" id="hint">Tip: During a quiz, the run pauses. Jump to hit A/B/C brick.</div>
         </div>
         <div class="qText" id="qText">Press Start to begin.</div>
         <div class="choices" id="choices"></div>
@@ -210,22 +238,13 @@
         <canvas id="c"></canvas>
 
         <div class="controls">
-          <div class="ctl" id="leftBtn" role="button" tabindex="0">
-            ◀ Move
-            <small>← / A</small>
-          </div>
-          <div class="ctl" id="jumpBtn" role="button" tabindex="0">
-            ⤒ Jump
-            <small>Space / ↑</small>
-          </div>
-          <div class="ctl" id="rightBtn" role="button" tabindex="0">
-            Move ▶
-            <small>→ / D</small>
-          </div>
+          <div class="ctl" id="leftBtn" role="button" tabindex="0">◀ Move <small>← / A</small></div>
+          <div class="ctl" id="jumpBtn" role="button" tabindex="0">⤒ Jump <small>Space / ↑</small></div>
+          <div class="ctl" id="rightBtn" role="button" tabindex="0">Move ▶ <small>→ / D</small></div>
         </div>
 
         <div class="footerRow">
-          <div class="tiny">No game-over on wrong answers • Respawns safely if you fall • End screen offers CSV download</div>
+          <div class="tiny">No game-over for wrong answers • Auto-continue if you don’t answer in time</div>
           <button class="btn" id="startBtn">Start</button>
         </div>
       </section>
@@ -238,10 +257,10 @@
     <h2 id="modalTitle">How to Play</h2>
     <div id="modalBody">
       <ul>
-        <li>Move with <b>Left/Right</b> (←/→ or A/D). Jump with <b>Space</b> (or ↑). On mobile, use the buttons.</li>
-        <li>When a question appears, three answer blocks <b>A / B / C</b> appear ahead.</li>
-        <li>Jump to hit the block of your chosen option. You get instant feedback and continue.</li>
-        <li>Wrong answer does not stop the level (you just don’t get the points).</li>
+        <li>Move with <b>Left/Right</b> (←/→ or A/D). Jump with <b>Space</b> (or ↑). On mobile, use buttons.</li>
+        <li>At checkpoints, the game pauses and shows a question.</li>
+        <li>Three bricks <b>A / B / C</b> appear above you. Jump to hit the brick you choose.</li>
+        <li>If you don’t answer within a few seconds, the game auto-continues (logged as no-answer).</li>
         <li>At the end, download CSV for analysis.</li>
       </ul>
     </div>
@@ -252,54 +271,47 @@
 </div>
 
 <script>
-/* =========================
-   QUESTION BANK (A/B/C)
-   Based on the attached chapters (Smartphone, Android, iOS security).
-   Keep questions short for on-screen readability.
-   ========================= */
+/* =========================================================
+   QUESTION BANK (A/B/C) — short readable items
+   (You can extend this bank; keep text concise for platformer UI.)
+   ========================================================= */
 const QUESTION_BANK = [
   {id:"AS01",topic:"Android: Access control",q:"Why enable SIM card lock on Android?",
-   A:"Require PIN before SIM works after power-on",B:"Boost Wi-Fi speed",C:"Auto-install updates",correct:"A",
-   why:"SIM lock prevents SIM use without the PIN after restart."},
+   A:"Require PIN before SIM works after restart",B:"Boost Wi-Fi speed",C:"Auto-install updates",correct:"A",
+   why:"SIM lock blocks SIM use without the PIN after reboot."},
+
   {id:"AS02",topic:"Android: Screen lock",q:"Which lock is stronger for Android devices?",
    A:"PIN or Password",B:"No lock for convenience",C:"Wallpaper lock",correct:"A",
    why:"PIN/password can be stronger and longer than patterns."},
-  {id:"AS03",topic:"Android: Encryption",q:"On Android 4.0+ which feature should be enabled?",
+
+  {id:"AS03",topic:"Android: Encryption",q:"On Android 4.0+, which feature should be enabled?",
    A:"Device encryption",B:"Always-on NFC",C:"Auto caller ID hide",correct:"A",
    why:"Encryption protects stored data if the phone is lost."},
-  {id:"AS04",topic:"Android: Network hygiene",q:"Which radios should be off when not needed?",
-   A:"Wi-Fi and Bluetooth",B:"Only brightness",C:"Alarm clock",correct:"A",
-   why:"Disabling radios reduces exposure and attack surface."},
-  {id:"AS05",topic:"Android: NFC",q:"If NFC is on by default, safer practice is:",
-   A:"Turn it off when not needed",B:"Keep it on permanently",C:"Disable screen lock",correct:"A",
-   why:"NFC should be on only when required."},
+
   {id:"SS01",topic:"Smartphones: App install",q:"Safest place to install apps from is:",
    A:"Official app stores",B:"Random APK websites",C:"Unknown message links",correct:"A",
    why:"Official stores reduce (not remove) malware risk."},
+
   {id:"SS03",topic:"Smartphones: Permissions",q:"If an app asks unnecessary permissions, you should:",
    A:"Be suspicious; decline/uninstall",B:"Always accept to continue",C:"Disable passcode",correct:"A",
    why:"Unnecessary permissions can indicate data harvesting."},
-  {id:"SS04",topic:"Smartphones: Unused apps",q:"Why uninstall apps you no longer use?",
-   A:"Ownership may change and updates can become risky",B:"It encrypts SMS",C:"It blocks GPS forever",correct:"A",
-   why:"Apps can later introduce unwanted behavior via updates."},
+
   {id:"SS06",topic:"Mobile networks",q:"SMS text messages are generally:",
    A:"Sent unencrypted",B:"End-to-end encrypted by default",C:"Encrypted by screen lock",correct:"A",
    why:"SMS can be vulnerable to interception."},
-  {id:"SS07",topic:"Mobile threats",q:"An IMSI catcher can be used to:",
-   A:"Act like a fake cell tower to track/intercept",B:"Improve battery health",C:"Encrypt backups",correct:"A",
-   why:"It can trick phones into connecting to it."},
+
   {id:"SS08",topic:"Secure messaging",q:"A common encrypted messaging app is:",
    A:"Signal",B:"Any SMS app",C:"Caller ID hide feature",correct:"A",
    why:"Signal supports encrypted messages and calls."},
+
   {id:"IOS01",topic:"iOS: Data protection",q:"On iOS, encryption is strongest when you set a:",
    A:"Passcode / passphrase",B:"Wallpaper",C:"Ringtone",correct:"A",
    why:"Passcode enables iOS data protection features."},
-  {id:"IOS02",topic:"iOS: Passcode strength",q:"A stronger iOS passcode is ideally:",
-   A:"Long alphanumeric",B:"Always 4 digits",C:"No passcode if FaceID exists",correct:"A",
-   why:"Longer alphanumeric codes are harder to crack."},
+
   {id:"IOS03",topic:"iOS: Backup",q:"In iTunes, which option encrypts local backups?",
    A:"Encrypt backup",B:"Fast sync",C:"Share analytics",correct:"A",
    why:"Backups are not encrypted by default unless enabled."},
+
   {id:"IOS04",topic:"iOS: Safety feature",q:"A safety feature can erase data after:",
    A:"10 failed passcode attempts",B:"10 minutes no Wi-Fi",C:"10 missed calls",correct:"A",
    why:"Helps protect data during repeated guessing attempts."}
@@ -318,10 +330,13 @@ function escapeHtml(s){
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[m]));
 }
+function getCss(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 
-/* =========================
+/* =========================================================
    UI
-   ========================= */
+   ========================================================= */
 const scoreEl = document.getElementById("score");
 const accEl   = document.getElementById("acc");
 const qnumEl  = document.getElementById("qnum");
@@ -337,92 +352,83 @@ document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
 document.getElementById("restartBtn").onclick = ()=> boot(true);
 document.getElementById("startBtn").onclick = ()=> { if(!state.running) startGame(); };
 
-/* =========================
-   GAME TUNING (readable pace)
-   ========================= */
-const RUN_SPEED      = 3.0;     // horizontal speed (player max)
-const GRAVITY        = 0.75;    // gravity
-const JUMP_VEL       = -13.5;   // jump strength
-const FRICTION       = 0.82;    // ground friction
-const AIR_FRICTION   = 0.93;    // air friction
-const CAMERA_LERP    = 0.09;    // camera smoothing
-const SAFE_FALL_Y    = 1200;    // reset if player falls
-const LEVEL_END_X    = 5200;    // end position
-const QUESTIONS_PER_RUN = 10;   // keep short (low load)
-const FEEDBACK_MS    = 950;     // popup duration
+/* =========================================================
+   TUNING (slower + readable + Mario-like)
+   ========================================================= */
+const GRAVITY = 0.78;
+const JUMP_VEL = -13.8;
+const MAX_SPEED = 3.0;
+const ACCEL = 0.55;
+const GROUND_FRICTION = 0.82;
+const AIR_FRICTION = 0.93;
 
-/* =========================
-   WORLD / LEVEL
-   Simple tile-like rectangles and coins.
-   ========================= */
+const CAMERA_LERP = 0.10;
+
+const QUESTIONS_PER_RUN = 8;       // keep short
+const QUIZ_TIMEOUT_MS = 9000;      // plenty of time to read & answer
+const FEEDBACK_MS = 950;
+const SAFE_FALL_Y = 1400;
+const LEVEL_END_X = 5200;
+
+/* =========================================================
+   LEVEL (simple, consistent, fewer frustrating jumps)
+   ========================================================= */
 function makeLevel(){
-  // platforms: {x,y,w,h}
-  const p = [];
-  // ground segments with some gaps (pits)
-  p.push({x:0,y:420,w:900,h:60});
-  p.push({x:980,y:420,w:820,h:60});
-  p.push({x:1880,y:420,w:820,h:60});
-  p.push({x:2800,y:420,w:900,h:60});
-  p.push({x:3800,y:420,w:950,h:60});
-  p.push({x:4850,y:420,w:520,h:60});
+  const platforms = [];
+  // ground segments with gentle gaps
+  platforms.push({x:0,y:430,w:950,h:60});
+  platforms.push({x:1030,y:430,w:950,h:60});
+  platforms.push({x:2100,y:430,w:950,h:60});
+  platforms.push({x:3200,y:430,w:950,h:60});
+  platforms.push({x:4350,y:430,w:950,h:60});
 
-  // small raised platforms
-  p.push({x:520,y:320,w:180,h:20});
-  p.push({x:1240,y:300,w:220,h:20});
-  p.push({x:2140,y:310,w:220,h:20});
-  p.push({x:3040,y:290,w:260,h:20});
-  p.push({x:4100,y:300,w:220,h:20});
+  // a few small platforms (optional coins, not required)
+  platforms.push({x:520,y:340,w:200,h:22});
+  platforms.push({x:1520,y:330,w:240,h:22});
+  platforms.push({x:2620,y:325,w:240,h:22});
+  platforms.push({x:3780,y:335,w:240,h:22});
+  platforms.push({x:4680,y:320,w:220,h:22});
 
-  // staircase blocks
-  p.push({x:1450,y:360,w:80,h:60});
-  p.push({x:1535,y:330,w:80,h:90});
-  p.push({x:1620,y:300,w:80,h:120});
-
-  // goal platform area
-  p.push({x:5000,y:320,w:220,h:20});
-
-  // coins (mostly cosmetic)
-  const coins = [];
-  function coinLine(x0,y0,n,dx){
-    for(let i=0;i<n;i++) coins.push({x:x0+i*dx,y:y0,r:8,taken:false});
-  }
-  coinLine(200,360,6,40);
-  coinLine(560,280,4,40);
-  coinLine(1100,360,6,40);
-  coinLine(2000,360,5,40);
-  coinLine(2840,360,6,40);
-  coinLine(4100,260,4,40);
-
-  // checkpoints where a question triggers
+  // checkpoints where quiz triggers
   const checkpoints = [
-    {x:620, used:false},
-    {x:1320, used:false},
-    {x:2200, used:false},
-    {x:3120, used:false},
-    {x:4020, used:false},
-    {x:4900, used:false},
+    {x:640, used:false},
+    {x:1540, used:false},
+    {x:2660, used:false},
+    {x:3820, used:false},
+    {x:4700, used:false},
   ];
 
-  return {platforms:p, coins, checkpoints};
+  // coins (cosmetic, tiny points)
+  const coins = [];
+  const coinLine = (x0,y0,n,dx)=>{ for(let i=0;i<n;i++) coins.push({x:x0+i*dx,y:y0,r:8,taken:false}); };
+  coinLine(200,380,6,40);
+  coinLine(560,300,4,40);
+  coinLine(1160,380,6,40);
+  coinLine(2280,380,6,40);
+  coinLine(3380,380,6,40);
+  coinLine(4480,380,6,40);
+
+  return {platforms, checkpoints, coins};
 }
 
-/* =========================
+/* =========================================================
    STATE
-   ========================= */
+   ========================================================= */
 const state = {
   running:false,
-  phase:"menu",          // menu | play | quiz | end
+  phase:"menu",        // menu | play | quiz | end
   score:0,
   correct:0,
   attempted:0,
   questions:[],
   qIndex:0,
   current:null,
+  quizStart:0,
   log:[],
   popUntil:0,
   cameraX:0,
   lastSafeX:80,
-  lastSafeY:260
+  lastSafeY:280
 };
 
 function updateHUD(){
@@ -452,9 +458,9 @@ function showPopup(ok, correctKey, why){
   state.popUntil = performance.now() + FEEDBACK_MS;
 }
 
-/* =========================
-   CANVAS + RENDERING
-   ========================= */
+/* =========================================================
+   CANVAS SETUP
+   ========================================================= */
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
 
@@ -465,74 +471,87 @@ function fitCanvas(){
   canvas.height = Math.floor(rect.height * dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
-window.addEventListener("resize", fitCanvas);
+window.addEventListener("resize", ()=>{ fitCanvas(); initParallax(); });
 
-const world = {
-  ...makeLevel(),
-  stars:[]
-};
-
-function initStars(){
+/* Parallax background elements */
+let clouds = [];
+let hills = [];
+let stars = [];
+function initParallax(){
   const rect = canvas.getBoundingClientRect();
-  const w = rect.width, h = rect.height;
-  world.stars = [];
+  const W = rect.width, H = rect.height;
+
+  stars = [];
   for(let i=0;i<80;i++){
-    world.stars.push({x:Math.random()*w, y:Math.random()*h*0.6, r:0.7+Math.random()*1.5, s:0.2+Math.random()*0.9});
+    stars.push({x:Math.random()*W, y:Math.random()*H*0.55, r:0.7+Math.random()*1.5, s:0.2+Math.random()*0.9});
+  }
+  clouds = [];
+  for(let i=0;i<10;i++){
+    clouds.push({x:Math.random()*6000, y:60+Math.random()*140, w:120+Math.random()*160, h:30+Math.random()*30, sp:0.08+Math.random()*0.10});
+  }
+  hills = [];
+  for(let i=0;i<8;i++){
+    hills.push({x:i*900 + Math.random()*200, y:320+Math.random()*60, w:680+Math.random()*260, h:220+Math.random()*160});
   }
 }
 
+/* World */
+let world = makeLevel();
+
 /* Player */
 const player = {
-  x:80, y:260, w:38, h:52,
+  x:80, y:280, w:38, h:52,
   vx:0, vy:0,
   onGround:false,
-  face:1,          // 1 right, -1 left
   step:0
 };
 
 /* Input */
-const input = {left:false,right:false,jump:false,jumpQueued:false};
-
-function keyDown(e){
-  if(e.code==="ArrowLeft" || e.code==="KeyA") input.left = true;
-  if(e.code==="ArrowRight" || e.code==="KeyD") input.right = true;
-  if(e.code==="ArrowUp" || e.code==="Space") { input.jump = true; input.jumpQueued = true; }
-}
-function keyUp(e){
-  if(e.code==="ArrowLeft" || e.code==="KeyA") input.left = false;
-  if(e.code==="ArrowRight" || e.code==="KeyD") input.right = false;
-  if(e.code==="ArrowUp" || e.code==="Space") input.jump = false;
-}
-window.addEventListener("keydown", (e)=>{ if(["ArrowLeft","ArrowRight","ArrowUp","Space","KeyA","KeyD"].includes(e.code)) e.preventDefault(); keyDown(e); });
-window.addEventListener("keyup", keyUp);
+const input = {left:false, right:false, jumpQueued:false};
+window.addEventListener("keydown",(e)=>{
+  const k = e.code;
+  if(["ArrowLeft","ArrowRight","ArrowUp","Space","KeyA","KeyD"].includes(k)) e.preventDefault();
+  if(k==="ArrowLeft" || k==="KeyA") input.left = true;
+  if(k==="ArrowRight"|| k==="KeyD") input.right = true;
+  if(k==="ArrowUp" || k==="Space") input.jumpQueued = true;
+});
+window.addEventListener("keyup",(e)=>{
+  const k = e.code;
+  if(k==="ArrowLeft" || k==="KeyA") input.left = false;
+  if(k==="ArrowRight"|| k==="KeyD") input.right = false;
+});
 
 /* Mobile buttons */
-const leftBtn = document.getElementById("leftBtn");
-const rightBtn = document.getElementById("rightBtn");
-const jumpBtn = document.getElementById("jumpBtn");
-
 function bindHold(btn, onDown, onUp){
   btn.addEventListener("pointerdown",(e)=>{ e.preventDefault(); onDown(); });
   btn.addEventListener("pointerup",(e)=>{ e.preventDefault(); onUp(); });
   btn.addEventListener("pointercancel",(e)=>{ e.preventDefault(); onUp(); });
-  btn.addEventListener("pointerleave",(e)=>{ /* don't force up */ });
 }
-bindHold(leftBtn, ()=>input.left=true, ()=>input.left=false);
-bindHold(rightBtn, ()=>input.right=true, ()=>input.right=false);
-jumpBtn.addEventListener("pointerdown",(e)=>{ e.preventDefault(); input.jumpQueued = true; });
+bindHold(document.getElementById("leftBtn"), ()=>input.left=true, ()=>input.left=false);
+bindHold(document.getElementById("rightBtn"),()=>input.right=true,()=>input.right=false);
+document.getElementById("jumpBtn").addEventListener("pointerdown",(e)=>{ e.preventDefault(); input.jumpQueued = true; });
 
-/* Collisions */
+/* Rect helpers */
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
 function aabb(a,b){
   return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
 }
-function resolvePlatformCollisions(){
+
+/* Collision resolution */
+function resolvePlatforms(){
   player.onGround = false;
   for(const pl of world.platforms){
-    // broadphase
     if(player.x + player.w < pl.x || player.x > pl.x + pl.w) continue;
     if(player.y + player.h < pl.y || player.y > pl.y + pl.h) continue;
 
-    // compute overlap
     const ox1 = (pl.x + pl.w) - player.x;
     const ox2 = (player.x + player.w) - pl.x;
     const oy1 = (pl.y + pl.h) - player.y;
@@ -541,12 +560,10 @@ function resolvePlatformCollisions(){
     const oy = Math.min(oy1, oy2);
 
     if(ox < oy){
-      // horizontal
       if(player.x < pl.x) player.x -= ox;
       else player.x += ox;
       player.vx = 0;
     } else {
-      // vertical
       if(player.y < pl.y){
         player.y -= oy;
         player.vy = 0;
@@ -561,74 +578,40 @@ function resolvePlatformCollisions(){
   }
 }
 
-/* Quiz blocks spawned at checkpoints */
-let quizBlocks = []; // {x,y,w,h,key,hit:false}
-let quizAnchorX = 0;
+/* =========================================================
+   QUIZ BRICKS (true Mario-style row)
+   ========================================================= */
+let quizBricks = []; // {key,x,y,w,h,hit}
+let quizArea = null; // {x0,x1,groundY}
+function spawnQuizBricks(){
+  // Anchor bricks centered above the player, visible & reachable.
+  const groundY = 430;
+  const bw = 56, bh = 46, gap = 18;
 
-function spawnQuizBlocks(atX){
-  // Place blocks ahead at three heights, like Mario question bricks.
-  quizAnchorX = atX + 240;
-  const topY = 240, midY = 290, botY = 340; // screen-space-ish; we will use world y
-  // We anchor them around ground height (420) so they appear reachable
-  // Convert to world y so player can jump from ground
-  const baseY = 260; // block top baseline relative to world
-  quizBlocks = [
-    {key:"A", x:quizAnchorX,     y:baseY-90, w:46, h:46, hit:false},
-    {key:"B", x:quizAnchorX+70,  y:baseY-60, w:46, h:46, hit:false},
-    {key:"C", x:quizAnchorX+140, y:baseY-30, w:46, h:46, hit:false},
+  const centerX = player.x + 220;
+  const rowY = groundY - 170; // row height
+
+  const startX = centerX - (bw*3 + gap*2)/2;
+
+  quizBricks = [
+    {key:"A", x:startX,            y:rowY, w:bw, h:bh, hit:false},
+    {key:"B", x:startX + bw+gap,   y:rowY, w:bw, h:bh, hit:false},
+    {key:"C", x:startX + (bw+gap)*2,y:rowY,w:bw, h:bh, hit:false},
   ];
+
+  // define quiz area; keep player from drifting too far while answering
+  quizArea = {x0: startX - 120, x1: startX + (bw+gap)*2 + bw + 120, groundY};
 }
 
-function drawBlock(b){
-  const col = b.key==="A" ? getCss("--a") : b.key==="B" ? getCss("--b") : getCss("--c");
-  ctx.save();
-  ctx.globalAlpha = b.hit ? 0.25 : 0.92;
-
-  // body
-  ctx.fillStyle = col;
-  roundRect(b.x, b.y, b.w, b.h, 10);
-  ctx.fill();
-
-  // highlight
-  ctx.globalAlpha *= 0.35;
-  ctx.fillStyle = "white";
-  roundRect(b.x+6, b.y+6, b.w-12, 10, 6);
-  ctx.fill();
-
-  // label
-  ctx.globalAlpha = b.hit ? 0.25 : 1;
-  ctx.fillStyle = "rgba(11,18,32,.92)";
-  ctx.font = "950 20px system-ui,Segoe UI,Arial";
-  ctx.fillText(b.key, b.x + b.w/2 - 7, b.y + 30);
-
-  ctx.restore();
-}
-
-function roundRect(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
-
-function getCss(name){
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-/* Detect hitting block from below */
-function checkHitQuizBlocks(){
+/* Detect hit from below */
+function checkBrickHit(){
   if(state.phase !== "quiz") return;
 
-  const head = {x:player.x+6, y:player.y-4, w:player.w-12, h:8};
-  for(const b of quizBlocks){
+  const head = {x:player.x+6, y:player.y-6, w:player.w-12, h:10};
+  for(const b of quizBricks){
     if(b.hit) continue;
-
-    // if player moving up and head intersects bottom of block
-    const bottomBand = {x:b.x, y:b.y+b.h-6, w:b.w, h:10};
-    if(player.vy < -1 && aabb(head, bottomBand)){
+    const bottom = {x:b.x, y:b.y+b.h-6, w:b.w, h:10};
+    if(player.vy < -1 && aabb(head, bottom)){
       b.hit = true;
       handleAnswer(b.key);
       break;
@@ -636,7 +619,52 @@ function checkHitQuizBlocks(){
   }
 }
 
-/* Answer handling */
+function drawBrick(b){
+  const col = b.key==="A" ? getCss("--a") : b.key==="B" ? getCss("--b") : getCss("--c");
+  ctx.save();
+  ctx.globalAlpha = b.hit ? 0.25 : 0.95;
+
+  // brick body
+  ctx.fillStyle = col;
+  roundRect(b.x,b.y,b.w,b.h,12);
+  ctx.fill();
+
+  // brick lines
+  ctx.globalAlpha *= 0.35;
+  ctx.strokeStyle = "rgba(255,255,255,.75)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(b.x+10, b.y+16);
+  ctx.lineTo(b.x+b.w-10, b.y+16);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(b.x+10, b.y+30);
+  ctx.lineTo(b.x+b.w-10, b.y+30);
+  ctx.stroke();
+
+  // label
+  ctx.globalAlpha = b.hit ? 0.25 : 1;
+  ctx.fillStyle = "rgba(11,18,32,.92)";
+  ctx.font = "950 22px system-ui,Segoe UI,Arial";
+  ctx.fillText(b.key, b.x + b.w/2 - 7, b.y + 30);
+
+  // subtle arrow hint above bricks during quiz
+  ctx.globalAlpha = 0.95;
+  ctx.fillStyle = "rgba(255,255,255,.20)";
+  ctx.beginPath();
+  ctx.moveTo(b.x + b.w/2, b.y - 14);
+  ctx.lineTo(b.x + b.w/2 - 10, b.y - 2);
+  ctx.lineTo(b.x + b.w/2 + 10, b.y - 2);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* =========================================================
+   ANSWER HANDLING
+   ========================================================= */
 function handleAnswer(selected){
   const q = state.current;
   const ok = (selected === q.correct);
@@ -645,13 +673,13 @@ function handleAnswer(selected){
   if(ok){
     state.correct += 1;
     state.score += 10;
-  } else {
-    // no penalty, still progress
   }
+
   updateHUD();
   showPopup(ok, q.correct, q.why);
 
-  // log
+  // log (with response time)
+  const rt = Math.max(0, Math.round(performance.now() - state.quizStart));
   state.log.push({
     ts: new Date().toISOString(),
     qid: q.id,
@@ -659,147 +687,150 @@ function handleAnswer(selected){
     selected,
     correct: q.correct,
     is_correct: ok ? 1 : 0,
+    response_ms: rt,
     score_after: state.score,
     question: q.q
   });
 
-  // show feedback briefly then resume
+  // brief feedback then continue
   setTimeout(()=>{
-    // clear blocks and resume play
-    quizBlocks = [];
+    quizBricks = [];
+    quizArea = null;
     state.phase = "play";
     topicBadge.textContent = "Running";
-    // small coin burst effect (simple score bump)
-    if(ok) state.score += 0; // keep learning scoring clean
-    updateHUD();
-    // next question will trigger at next checkpoint
   }, FEEDBACK_MS + 120);
 }
 
-/* =========================
-   CHECKPOINT / QUESTION FLOW
-   ========================= */
+function autoNoAnswer(){
+  if(state.phase !== "quiz") return;
+  // log as no-answer (NA), mark incorrect
+  const q = state.current;
+  state.attempted += 1;
+  updateHUD();
+  showPopup(false, q.correct, "No answer recorded.");
+
+  state.log.push({
+    ts: new Date().toISOString(),
+    qid: q.id,
+    topic: q.topic,
+    selected: "NA",
+    correct: q.correct,
+    is_correct: 0,
+    response_ms: QUIZ_TIMEOUT_MS,
+    score_after: state.score,
+    question: q.q
+  });
+
+  setTimeout(()=>{
+    quizBricks = [];
+    quizArea = null;
+    state.phase = "play";
+    topicBadge.textContent = "Running";
+  }, FEEDBACK_MS + 120);
+}
+
+/* =========================================================
+   QUESTION FLOW
+   ========================================================= */
 function prepareQuestions(){
-  const shuffled = shuffle(QUESTION_BANK);
-  state.questions = shuffled.slice(0, Math.min(QUESTIONS_PER_RUN, shuffled.length));
+  const s = shuffle(QUESTION_BANK);
+  state.questions = s.slice(0, Math.min(QUESTIONS_PER_RUN, s.length));
   state.qIndex = 0;
   qtotalEl.textContent = String(state.questions.length);
 }
 
-function triggerNextQuestion(){
+function startQuiz(){
   if(state.qIndex >= state.questions.length) return false;
   const q = state.questions[state.qIndex++];
   renderQuestion(q);
+
   state.phase = "quiz";
-  spawnQuizBlocks(player.x);
+  state.quizStart = performance.now();
+  topicBadge.textContent = "Question";
+
+  // freeze horizontal speed to reduce load
+  player.vx = 0;
+
+  spawnQuizBricks();
   return true;
 }
 
-/* =========================
-   DRAW WORLD
-   ========================= */
-function draw(now){
-  const rect = canvas.getBoundingClientRect();
-  const W = rect.width, H = rect.height;
-
-  // hide popup when time passed
-  if(popupEl.style.display==="block" && now > state.popUntil) popupEl.style.display="none";
-
-  ctx.clearRect(0,0,W,H);
-
-  // background stars parallax
+/* =========================================================
+   DRAW
+   ========================================================= */
+function drawBackground(W,H){
+  // stars
   ctx.fillStyle = "rgba(255,255,255,.80)";
-  for(const st of world.stars){
-    const x = (st.x + (state.cameraX*0.18)*st.s) % W;
+  for(const st of stars){
+    const x = (st.x + (state.cameraX*0.10)*st.s) % W;
     ctx.beginPath();
     ctx.arc(x, st.y, st.r, 0, Math.PI*2);
     ctx.fill();
   }
 
-  // camera translate
-  ctx.save();
-  ctx.translate(-state.cameraX, 0);
-
-  // horizon / sky tint
-  const sky = ctx.createLinearGradient(0,0,0,H);
-  sky.addColorStop(0,"rgba(100,181,255,.10)");
-  sky.addColorStop(0.55,"rgba(0,0,0,0)");
-  sky.addColorStop(1,"rgba(0,0,0,.25)");
-  ctx.fillStyle = sky;
-  ctx.fillRect(state.cameraX,0,W,H);
-
-  // platforms
-  for(const pl of world.platforms){
-    // base
-    ctx.fillStyle = "rgba(255,255,255,.12)";
-    roundRect(pl.x, pl.y, pl.w, pl.h, 14);
-    ctx.fill();
-    // top shine
-    ctx.fillStyle = "rgba(100,181,255,.10)";
-    roundRect(pl.x+8, pl.y+8, pl.w-16, 12, 8);
-    ctx.fill();
-  }
-
-  // coins
-  for(const c of world.coins){
-    if(c.taken) continue;
-    ctx.save();
-    const g = ctx.createRadialGradient(c.x, c.y, 2, c.x, c.y, c.r*1.8);
-    g.addColorStop(0, "rgba(255,209,102,.95)");
-    g.addColorStop(1, "rgba(255,209,102,.12)");
-    ctx.fillStyle = g;
+  // hills
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = "rgba(100,181,255,.90)";
+  for(const h of hills){
+    const x = h.x - state.cameraX*0.14;
     ctx.beginPath();
-    ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+    ctx.ellipse(x, h.y, h.w/2, h.h/2, 0, 0, Math.PI*2);
     ctx.fill();
-    ctx.restore();
   }
+  ctx.globalAlpha = 1;
 
-  // checkpoint markers (subtle)
-  ctx.strokeStyle = "rgba(255,255,255,.14)";
-  ctx.lineWidth = 2;
-  for(const cp of world.checkpoints){
-    ctx.beginPath();
-    ctx.moveTo(cp.x, 240);
-    ctx.lineTo(cp.x, 420);
-    ctx.stroke();
-  }
-
-  // quiz blocks
-  if(state.phase === "quiz"){
-    for(const b of quizBlocks) drawBlock(b);
-  }
-
-  // goal flag
-  ctx.strokeStyle = "rgba(255,255,255,.55)";
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(LEVEL_END_X, 240);
-  ctx.lineTo(LEVEL_END_X, 420);
-  ctx.stroke();
-  ctx.fillStyle = "rgba(57,217,138,.80)";
-  roundRect(LEVEL_END_X, 250, 70, 38, 10);
-  ctx.fill();
-  ctx.fillStyle = "rgba(11,18,32,.92)";
-  ctx.font = "900 14px system-ui,Segoe UI,Arial";
-  ctx.fillText("FINISH", LEVEL_END_X+10, 274);
-
-  // player (nice “cyber suit”)
-  drawPlayer(now);
-
-  ctx.restore();
-
-  // ground hints
-  if(state.phase === "quiz"){
-    ctx.fillStyle = "rgba(255,255,255,.10)";
-    ctx.fillRect(0, H-40, W, 40);
-    ctx.fillStyle = "rgba(234,240,255,.92)";
-    ctx.font = "800 12px system-ui,Segoe UI,Arial";
-    ctx.fillText("Answer now: Jump and hit A / B / C block", 12, H-16);
+  // clouds
+  for(const cl of clouds){
+    const cx = cl.x - state.cameraX*cl.sp;
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    roundRect(cx, cl.y, cl.w, cl.h, 18);
+    ctx.fill();
   }
 }
 
+function drawPlatforms(){
+  for(const pl of world.platforms){
+    ctx.fillStyle = getCss("--tile");
+    roundRect(pl.x, pl.y, pl.w, pl.h, 16);
+    ctx.fill();
+    ctx.fillStyle = getCss("--tile2");
+    roundRect(pl.x+8, pl.y+8, pl.w-16, 12, 8);
+    ctx.fill();
+  }
+}
+
+function drawCoins(){
+  for(const c of world.coins){
+    if(c.taken) continue;
+    const g = ctx.createRadialGradient(c.x,c.y,2,c.x,c.y,c.r*1.9);
+    g.addColorStop(0,"rgba(255,209,102,.95)");
+    g.addColorStop(1,"rgba(255,209,102,.10)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function drawGoal(){
+  ctx.strokeStyle = "rgba(255,255,255,.55)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(LEVEL_END_X, 250);
+  ctx.lineTo(LEVEL_END_X, 430);
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(57,217,138,.85)";
+  roundRect(LEVEL_END_X, 260, 76, 42, 12);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(11,18,32,.92)";
+  ctx.font = "900 14px system-ui,Segoe UI,Arial";
+  ctx.fillText("FINISH", LEVEL_END_X+10, 286);
+}
+
 function drawPlayer(now){
-  player.step += (Math.abs(player.vx) > 0.5 ? 0.22 : 0.08);
+  player.step += (Math.abs(player.vx) > 0.4 ? 0.22 : 0.10);
 
   // shadow
   ctx.fillStyle = "rgba(0,0,0,.30)";
@@ -807,35 +838,30 @@ function drawPlayer(now){
   ctx.ellipse(player.x + player.w/2, player.y + player.h + 12, 18, 6, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // suit body
-  const g = ctx.createLinearGradient(player.x, player.y, player.x+player.w, player.y+player.h);
-  g.addColorStop(0, "rgba(255,255,255,.92)");
-  g.addColorStop(1, "rgba(200,220,255,.78)");
+  // body
+  const g = ctx.createLinearGradient(player.x,player.y,player.x+player.w,player.y+player.h);
+  g.addColorStop(0,"rgba(255,255,255,.92)");
+  g.addColorStop(1,"rgba(200,220,255,.78)");
   ctx.fillStyle = g;
-  roundRect(player.x, player.y, player.w, player.h, 14);
+  roundRect(player.x,player.y,player.w,player.h,14);
   ctx.fill();
 
   // outline glow
   ctx.strokeStyle = "rgba(100,181,255,.35)";
   ctx.lineWidth = 2;
-  roundRect(player.x, player.y, player.w, player.h, 14);
+  roundRect(player.x,player.y,player.w,player.h,14);
   ctx.stroke();
 
   // visor
-  const v = ctx.createLinearGradient(player.x+6, player.y+10, player.x+player.w-6, player.y+26);
-  v.addColorStop(0, "rgba(100,181,255,.75)");
-  v.addColorStop(1, "rgba(124,92,255,.55)");
+  const v = ctx.createLinearGradient(player.x+6,player.y+10,player.x+player.w-6,player.y+26);
+  v.addColorStop(0,"rgba(100,181,255,.75)");
+  v.addColorStop(1,"rgba(124,92,255,.55)");
   ctx.fillStyle = v;
-  roundRect(player.x+6, player.y+10, player.w-12, 14, 9);
-  ctx.fill();
-
-  // chest stripe
-  ctx.fillStyle = "rgba(255,255,255,.22)";
-  roundRect(player.x+10, player.y+32, player.w-20, 8, 6);
+  roundRect(player.x+6,player.y+10,player.w-12,14,9);
   ctx.fill();
 
   // legs
-  const step = Math.sin(player.step) * 7;
+  const step = Math.sin(player.step)*7;
   ctx.strokeStyle = "rgba(255,255,255,.88)";
   ctx.lineWidth = 6;
   ctx.lineCap = "round";
@@ -849,24 +875,87 @@ function drawPlayer(now){
   ctx.stroke();
 }
 
-/* =========================
-   GAME LOOP
-   ========================= */
-function physicsStep(){
-  if(state.phase === "end" || !state.running) return;
+function draw(now){
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
 
-  // during quiz, allow movement but keep it calmer
-  const speedCap = (state.phase === "quiz") ? RUN_SPEED*0.85 : RUN_SPEED;
+  if(popupEl.style.display==="block" && now > state.popUntil) popupEl.style.display="none";
 
-  if(input.left)  { player.vx -= 0.55; player.face = -1; }
-  if(input.right) { player.vx += 0.55; player.face =  1; }
+  ctx.clearRect(0,0,W,H);
+  drawBackground(W,H);
 
-  if(!input.left && !input.right){
-    player.vx *= (player.onGround ? FRICTION : AIR_FRICTION);
+  // camera transform
+  ctx.save();
+  ctx.translate(-state.cameraX, 0);
+
+  // world
+  drawPlatforms();
+  drawCoins();
+
+  // checkpoints line (subtle)
+  ctx.strokeStyle = "rgba(255,255,255,.10)";
+  ctx.lineWidth = 2;
+  for(const cp of world.checkpoints){
+    ctx.beginPath();
+    ctx.moveTo(cp.x, 250);
+    ctx.lineTo(cp.x, 430);
+    ctx.stroke();
   }
 
-  // cap speed
-  player.vx = Math.max(-speedCap, Math.min(speedCap, player.vx));
+  // quiz bricks
+  if(state.phase === "quiz"){
+    for(const b of quizBricks) drawBrick(b);
+
+    // quiz zone tint
+    if(quizArea){
+      ctx.globalAlpha = 0.08;
+      ctx.fillStyle = "white";
+      ctx.fillRect(quizArea.x0, 0, quizArea.x1-quizArea.x0, H);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  drawGoal();
+  drawPlayer(now);
+
+  ctx.restore();
+
+  // bottom hint
+  if(state.phase === "quiz"){
+    ctx.fillStyle = "rgba(255,255,255,.10)";
+    ctx.fillRect(0, H-40, W, 40);
+    ctx.fillStyle = "rgba(234,240,255,.92)";
+    ctx.font = "900 12px system-ui,Segoe UI,Arial";
+    ctx.fillText("Quiz: Jump and hit A / B / C brick. Run is paused.", 12, H-16);
+  }
+}
+
+/* =========================================================
+   PHYSICS / GAME LOOP
+   ========================================================= */
+function physicsStep(){
+  if(!state.running || state.phase === "end") return;
+
+  // During quiz: allow only small movement, prevent drifting away
+  const quizClamp = (state.phase === "quiz" && quizArea);
+
+  if(state.phase === "play"){
+    if(input.left)  player.vx -= ACCEL;
+    if(input.right) player.vx += ACCEL;
+  } else if(state.phase === "quiz"){
+    // smaller movement during quiz (optional)
+    if(input.left)  player.vx -= ACCEL*0.45;
+    if(input.right) player.vx += ACCEL*0.45;
+  }
+
+  // friction
+  if(!input.left && !input.right){
+    player.vx *= (player.onGround ? GROUND_FRICTION : AIR_FRICTION);
+  }
+
+  // clamp speed
+  const cap = (state.phase === "quiz") ? MAX_SPEED*0.55 : MAX_SPEED;
+  player.vx = Math.max(-cap, Math.min(cap, player.vx));
 
   // jump
   if(input.jumpQueued){
@@ -885,8 +974,14 @@ function physicsStep(){
   player.x += player.vx;
   player.y += player.vy;
 
-  // collide
-  resolvePlatformCollisions();
+  // quiz zone clamp
+  if(quizClamp){
+    if(player.x < quizArea.x0) { player.x = quizArea.x0; player.vx = 0; }
+    if(player.x > quizArea.x1) { player.x = quizArea.x1; player.vx = 0; }
+  }
+
+  // collisions
+  resolvePlatforms();
 
   // coin pickup
   for(const c of world.coins){
@@ -895,20 +990,19 @@ function physicsStep(){
     const dy = (player.y+player.h/2) - c.y;
     if(dx*dx + dy*dy < (c.r+18)*(c.r+18)){
       c.taken = true;
-      // keep coin score tiny
-      state.score += 1;
+      state.score += 1;   // tiny
       updateHUD();
     }
   }
 
-  // quiz hit detect
-  checkHitQuizBlocks();
+  // quiz brick hit check
+  checkBrickHit();
 
-  // camera follows
+  // camera follows player smoothly
   const target = Math.max(0, player.x - 220);
   state.cameraX += (target - state.cameraX) * CAMERA_LERP;
 
-  // if fall, respawn near last safe point
+  // fall recovery
   if(player.y > SAFE_FALL_Y){
     player.x = state.lastSafeX;
     player.y = state.lastSafeY;
@@ -916,14 +1010,20 @@ function physicsStep(){
     player.vy = 0;
   }
 
-  // checkpoint triggers (only in play phase)
+  // trigger checkpoints only in play phase
   if(state.phase === "play"){
     for(const cp of world.checkpoints){
       if(cp.used) continue;
       if(player.x > cp.x){
         cp.used = true;
-        if(triggerNextQuestion()){
-          topicBadge.textContent = "Question";
+        if(startQuiz()){
+          // quiz auto-timeout
+          setTimeout(()=>{
+            // only if still in quiz and the same question is active
+            if(state.phase === "quiz"){
+              autoNoAnswer();
+            }
+          }, QUIZ_TIMEOUT_MS);
         }
         break;
       }
@@ -931,7 +1031,7 @@ function physicsStep(){
   }
 
   // finish
-  if(player.x > LEVEL_END_X + 30){
+  if(player.x > LEVEL_END_X + 40){
     endGame();
   }
 }
@@ -942,77 +1042,71 @@ function tick(now){
   requestAnimationFrame(tick);
 }
 
-/* =========================
+/* =========================================================
    START / END / RESET
-   ========================= */
+   ========================================================= */
 function boot(hardReset=false){
-  state.running = false;
-  state.phase = "menu";
-  state.score = 0;
-  state.correct = 0;
-  state.attempted = 0;
-  state.log = [];
-  state.cameraX = 0;
-  state.lastSafeX = 80;
-  state.lastSafeY = 260;
-  state.popUntil = 0;
+  state.running=false;
+  state.phase="menu";
+  state.score=0;
+  state.correct=0;
+  state.attempted=0;
+  state.qIndex=0;
+  state.current=null;
+  state.log=[];
+  state.popUntil=0;
+  state.cameraX=0;
 
-  // reset world
-  const fresh = makeLevel();
-  world.platforms = fresh.platforms;
-  world.coins = fresh.coins;
-  world.checkpoints = fresh.checkpoints;
-  quizBlocks = [];
+  world = makeLevel();
+  player.x=80; player.y=280; player.vx=0; player.vy=0; player.onGround=false;
 
-  // reset player
-  player.x = 80; player.y = 260; player.vx = 0; player.vy = 0; player.onGround = false;
+  quizBricks=[]; quizArea=null;
 
-  // questions
   prepareQuestions();
-
   updateHUD();
-  topicBadge.textContent = "Ready";
-  qTextEl.textContent = "Press Start to begin.";
-  choicesEl.innerHTML = "";
-  popupEl.style.display = "none";
 
-  document.getElementById("startBtn").disabled = false;
-  document.getElementById("startBtn").textContent = "Start";
+  topicBadge.textContent="Ready";
+  qTextEl.textContent="Press Start to begin.";
+  choicesEl.innerHTML="";
+  popupEl.style.display="none";
+
+  document.getElementById("startBtn").disabled=false;
+  document.getElementById("startBtn").textContent="Start";
 
   if(hardReset){
-    try{ localStorage.removeItem("GBL_PLATFORMER_LAST_LOG"); }catch(e){}
+    try{ localStorage.removeItem("GBL_PLATFORMER_V2_LAST_LOG"); }catch(e){}
   }
 }
 
 function startGame(){
-  state.running = true;
-  state.phase = "play";
-  topicBadge.textContent = "Running";
-  qTextEl.textContent = "Run forward. Questions will appear at checkpoints.";
-  choicesEl.innerHTML = "";
-  document.getElementById("startBtn").disabled = true;
-  document.getElementById("startBtn").textContent = "Running…";
+  state.running=true;
+  state.phase="play";
+  topicBadge.textContent="Running";
+  qTextEl.textContent="Run forward. Questions appear at checkpoints (the run pauses).";
+  choicesEl.innerHTML="";
+  document.getElementById("startBtn").disabled=true;
+  document.getElementById("startBtn").textContent="Running…";
 }
 
 function endGame(){
-  state.running = false;
-  state.phase = "end";
-  document.getElementById("startBtn").disabled = false;
-  document.getElementById("startBtn").textContent = "Start";
+  state.running=false;
+  state.phase="end";
+  document.getElementById("startBtn").disabled=false;
+  document.getElementById("startBtn").textContent="Start";
 
   const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
 
   document.getElementById("modalTitle").textContent = "Level Completed";
   document.getElementById("modalBody").innerHTML = `
     <p><b>Score:</b> ${state.score} &nbsp; | &nbsp; <b>Accuracy:</b> ${acc}% &nbsp; | &nbsp; <b>Attempted:</b> ${state.attempted}</p>
-    <p class="muted">Download your attempt log as CSV for analysis. (Coins add small points; MCQs drive the main score.)</p>
+    <p class="muted">Download your attempt log as CSV for analysis.</p>
     <div class="row" style="justify-content:flex-start; margin-top:10px; gap:10px;">
       <button class="btn" id="dlBtn">Download CSV</button>
-      <button class="btn" id="reviewBtn">Review Questions</button>
+      <button class="btn" id="reviewBtn">Review</button>
     </div>
     <div id="reviewArea" style="display:none; margin-top:12px;"></div>
   `;
-  overlay.style.display = "flex";
+  overlay.style.display="flex";
 
   setTimeout(()=>{
     document.getElementById("dlBtn").onclick = downloadCSV;
@@ -1023,7 +1117,7 @@ function endGame(){
     };
   },0);
 
-  try{ localStorage.setItem("GBL_PLATFORMER_LAST_LOG", JSON.stringify(state.log)); }catch(e){}
+  try{ localStorage.setItem("GBL_PLATFORMER_V2_LAST_LOG", JSON.stringify(state.log)); }catch(e){}
 }
 
 function renderReviewHTML(){
@@ -1044,65 +1138,32 @@ function renderReviewHTML(){
       </div>
     `;
   }).join("");
-  return `<div style="max-height:260px; overflow:auto; padding-right:6px;">${items}</div>`;
+  return `<div style="max-height:280px; overflow:auto; padding-right:6px;">${items}</div>`;
 }
 
 function downloadCSV(){
-  const rows = [["ts","qid","topic","selected","correct","is_correct","score_after","question"]];
+  const rows = [["ts","qid","topic","selected","correct","is_correct","response_ms","score_after","question"]];
   for(const r of state.log){
-    rows.push([r.ts,r.qid,r.topic,r.selected,r.correct,r.is_correct,r.score_after,r.question]);
+    rows.push([r.ts,r.qid,r.topic,r.selected,r.correct,r.is_correct,r.response_ms,r.score_after,r.question]);
   }
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = "GBL_Platformer_Log.csv";
+  a.href = url; a.download = "GBL_Platformer_v2_Log.csv";
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 }
 
-/* =========================
-   QUIZ TRIGGER: show first question once you start moving
-   ========================= */
-function prepareQuestions(){
-  // We will consume questions on checkpoint triggers.
-  const shuffled = shuffle(QUESTION_BANK);
-  state.questions = shuffled.slice(0, Math.min(QUESTIONS_PER_RUN, shuffled.length));
-  state.qIndex = 0;
-  qtotalEl.textContent = String(state.questions.length);
-}
-
-function triggerNextQuestion(){
-  if(state.qIndex >= state.questions.length) return false;
-  const q = state.questions[state.qIndex++];
-  renderQuestion(q);
-  return true;
-}
-
-/* =========================
-   COMPLETE THE QUESTION FLOW
-   ========================= */
-function triggerNextQuestion(){
-  if(state.qIndex >= state.questions.length) return false;
-  const q = state.questions[state.qIndex++];
-  renderQuestion(q);
-  state.phase = "quiz";
-  spawnQuizBlocks(player.x);
-  return true;
-}
-
-/* =========================
-   HELPERS
-   ========================= */
-function aabb(a,b){ return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; }
-
-/* =========================
+/* =========================================================
    INIT
-   ========================= */
-overlay.style.display = "none";
-boot(false);
+   ========================================================= */
+document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
+document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
+
 fitCanvas();
-initStars();
+initParallax();
+boot(false);
 requestAnimationFrame(tick);
 </script>
 </body>
