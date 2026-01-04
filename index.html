@@ -1,15 +1,15 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>GBL Mario-Style Platformer v4 — Full Upgrade</title>
+  <title>GBL Runner v5 — Low Speed • Spaced Blocks • Better Player</title>
   <style>
     :root{
       --bg:#071025;
       --ink:#eaf0ff;
       --muted:#b9c6ff;
-
       --panel:rgba(255,255,255,.08);
       --border:rgba(255,255,255,.14);
       --shadow:0 12px 34px rgba(0,0,0,.35);
@@ -20,20 +20,11 @@
       --a:#7c5cff;
       --b:#33d6ff;
       --c:#ff7ad9;
-
-      --ground1:#14234a;
-      --ground2:#1d3270;
-      --grass:#2e65c4;
-
-      --uiBtn:rgba(255,255,255,.08);
-      --uiBtnBorder:rgba(255,255,255,.14);
     }
-
     *{box-sizing:border-box}
     body{
-      margin:0;
-      color:var(--ink);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0; color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:
         radial-gradient(1000px 450px at 70% 10%, rgba(100,181,255,.18), transparent 55%),
         radial-gradient(900px 420px at 20% 20%, rgba(124,92,255,.14), transparent 60%),
@@ -47,7 +38,7 @@
       display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;
     }
     .brand{display:flex; flex-direction:column; gap:2px; min-width:280px;}
-    .brand .t{font-weight:900; letter-spacing:.2px}
+    .brand .t{font-weight:900;}
     .brand .s{font-size:12px; color:var(--muted)}
     .hud{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
     .pill{
@@ -86,12 +77,8 @@
       padding:12px;
       backdrop-filter: blur(10px);
     }
-
     .qCard{flex:1.2; min-height:150px; position:relative; overflow:hidden;}
-    .qTitle{
-      display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;
-      margin-bottom:6px;
-    }
+    .qTitle{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;}
     .badge{
       font-size:12px;
       padding:6px 10px;
@@ -101,12 +88,7 @@
       white-space:nowrap;
       user-select:none;
     }
-    .qText{
-      font-size:16px;
-      line-height:1.28;
-      font-weight:900;
-      margin-top:6px;
-    }
+    .qText{font-size:16px; line-height:1.28; font-weight:900; margin-top:6px;}
     .choices{margin-top:10px; display:grid; gap:6px;}
     .choice{
       display:flex; gap:10px; align-items:center;
@@ -148,8 +130,8 @@
     .ctl{
       border-radius:16px;
       padding:14px 10px;
-      border:1px solid var(--uiBtnBorder);
-      background:var(--uiBtn);
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
       box-shadow:var(--shadow);
       user-select:none;
       display:flex; flex-direction:column; gap:4px;
@@ -159,7 +141,6 @@
       min-height:56px;
     }
     .ctl small{font-weight:700; color:var(--muted); line-height:1.2;}
-
     .footerRow{
       display:flex; gap:10px; flex-wrap:wrap;
       justify-content:space-between; align-items:center;
@@ -219,8 +200,8 @@
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="t">GBL Platformer v4 — Full Upgrade (Mario-Style)</div>
-      <div class="s">Quiz pauses + teleports player under A/B/C bricks • Camera centers on quiz • Coins visibly count</div>
+      <div class="t">GBL Runner v5 — Simple Logic (Low Speed + Spaced Options)</div>
+      <div class="s">Answer by colliding with the correct block • Jump over incorrect ones • Always visible on any screen</div>
     </div>
     <div class="hud">
       <div class="pill">Score: <b id="score">0</b></div>
@@ -237,7 +218,7 @@
       <section class="card qCard" aria-live="polite">
         <div class="qTitle">
           <div class="badge" id="topicBadge">Ready</div>
-          <div class="tiny muted">During quiz: jump to hit A/B/C brick. Player always visible.</div>
+          <div class="tiny muted">During question: collide with correct A/B/C block, jump over wrong ones.</div>
         </div>
         <div class="qText" id="qText">Press Start to begin.</div>
         <div class="choices" id="choices"></div>
@@ -248,13 +229,13 @@
         <canvas id="c"></canvas>
 
         <div class="controls">
-          <div class="ctl" id="leftBtn" role="button" tabindex="0">◀ Move <small>← / A</small></div>
+          <div class="ctl" id="leftBtn" role="button" tabindex="0">◀ Adjust <small>← / A</small></div>
           <div class="ctl" id="jumpBtn" role="button" tabindex="0">⤒ Jump <small>Space / ↑</small></div>
-          <div class="ctl" id="rightBtn" role="button" tabindex="0">Move ▶ <small>→ / D</small></div>
+          <div class="ctl" id="rightBtn" role="button" tabindex="0">Adjust ▶ <small>→ / D</small></div>
         </div>
 
         <div class="footerRow">
-          <div class="tiny">Coins +1 (visible). Correct +10. No game-over. CSV download at end.</div>
+          <div class="tiny">Low speed • Big readable questions • Options are spaced with safe landing gaps</div>
           <button class="btn" id="startBtn">Start</button>
         </div>
       </section>
@@ -267,12 +248,12 @@
     <h2 id="modalTitle">How to Play</h2>
     <div id="modalBody">
       <ul>
-        <li>Move with <b>←/→</b> or <b>A/D</b>. Jump with <b>Space</b> or <b>↑</b>. On mobile, use buttons.</li>
-        <li>At checkpoints, the run pauses and a question appears.</li>
-        <li>Three bricks <b>A/B/C</b> appear. The player is placed under them automatically.</li>
-        <li>Jump and hit the brick for your choice. Correct = <b>+10</b>.</li>
-        <li>Coins give <b>+1</b> with a visible popup.</li>
-        <li>If you do not answer in time, it records <b>NA</b> and continues.</li>
+        <li>The runner moves forward slowly.</li>
+        <li>Each question shows three option blocks A/B/C (spaced apart).</li>
+        <li><b>Goal:</b> collide with the correct option block. Jump over incorrect ones.</li>
+        <li>Jump: <b>Space</b> or <b>↑</b> (mobile: Jump button). You can also slightly adjust left/right.</li>
+        <li>Correct = <b>+10</b>. Wrong = <b>0</b> (and it moves to next question).</li>
+        <li>At end, you can download a CSV log for analysis.</li>
       </ul>
     </div>
     <div class="row">
@@ -283,43 +264,34 @@
 
 <script>
 /* =========================================================
-   QUESTION BANK (A/B/C). Replace these with your chapter items.
-   Keep text short for phone readability.
+   QUESTIONS
+   Replace these with your chapter-based questions.
+   Keep options short for phone readability.
    ========================================================= */
 const QUESTION_BANK = [
-  {id:"AS01",topic:"Android",q:"Why enable SIM card lock on Android?",
-   A:"Require PIN before SIM works after restart",B:"Boost Wi-Fi speed",C:"Auto-install updates",correct:"A",
-   why:"SIM lock blocks SIM use without the PIN after reboot."},
-
-  {id:"AS02",topic:"Android",q:"Which screen lock is stronger?",
-   A:"PIN or password",B:"No lock for convenience",C:"Wallpaper lock",correct:"A",
-   why:"PIN/password can be stronger and longer than patterns."},
-
-  {id:"SS01",topic:"Smartphone",q:"Safest place to install apps from is:",
-   A:"Official app stores",B:"Random APK websites",C:"Unknown links",correct:"A",
+  {id:"Q1",topic:"Mobile Security",q:"Safest place to install apps is:",
+   A:"Official app stores",B:"Random APK sites",C:"Unknown message links",correct:"A",
    why:"Official stores reduce (not remove) malware risk."},
-
-  {id:"SS03",topic:"Smartphone",q:"If an app asks unnecessary permissions:",
-   A:"Decline/uninstall",B:"Always accept",C:"Disable passcode",correct:"A",
+  {id:"Q2",topic:"Android",q:"Why enable SIM lock?",
+   A:"PIN needed after restart",B:"Faster internet",C:"Auto updates",correct:"A",
+   why:"SIM lock blocks SIM use without the PIN after reboot."},
+  {id:"Q3",topic:"Permissions",q:"If an app asks unnecessary permissions:",
+   A:"Decline/uninstall",B:"Always accept",C:"Turn off screen lock",correct:"A",
    why:"Unnecessary permissions can indicate data harvesting."},
-
-  {id:"IOS01",topic:"iOS",q:"On iOS, encryption is strongest when you set a:",
-   A:"Passcode/passphrase",B:"Wallpaper",C:"Ringtone",correct:"A",
-   why:"Passcode enables iOS data protection features."},
-
-  {id:"SS06",topic:"Network",q:"SMS messages are generally:",
-   A:"Sent unencrypted",B:"End-to-end encrypted",C:"Encrypted by screen lock",correct:"A",
+  {id:"Q4",topic:"Messaging",q:"SMS messages are generally:",
+   A:"Unencrypted",B:"End-to-end encrypted",C:"Encrypted by passcode",correct:"A",
    why:"SMS can be vulnerable to interception."},
-
-  {id:"SS08",topic:"Messaging",q:"A common encrypted messaging app is:",
-   A:"Signal",B:"Any SMS app",C:"Caller-ID hiding",correct:"A",
+  {id:"Q5",topic:"iOS",q:"iOS data protection is strongest with a:",
+   A:"Passcode",B:"Wallpaper",C:"Ringtone",correct:"A",
+   why:"Passcode enables iOS data protection features."},
+  {id:"Q6",topic:"Secure chat",q:"An encrypted messaging app is:",
+   A:"Signal",B:"Any SMS app",C:"Caller ID hide",correct:"A",
    why:"Signal supports encrypted messages and calls."},
-
-  {id:"IOS04",topic:"iOS",q:"iOS can erase data after:",
-   A:"10 failed passcode attempts",B:"10 minutes no Wi-Fi",C:"10 missed calls",correct:"A",
-   why:"Reduces risk of repeated passcode guessing."}
 ];
 
+/* =========================================================
+   Utilities
+   ========================================================= */
 function shuffle(arr){
   const a = arr.slice();
   for(let i=a.length-1;i>0;i--){
@@ -333,13 +305,11 @@ function escapeHtml(s){
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[m]));
 }
-function getCss(name){
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 
 /* =========================================================
-   UI
+   UI refs
    ========================================================= */
 const scoreEl = document.getElementById("score");
 const coinsEl = document.getElementById("coins");
@@ -351,92 +321,100 @@ const choicesEl = document.getElementById("choices");
 const topicBadge = document.getElementById("topicBadge");
 const popupEl = document.getElementById("popup");
 const overlay = document.getElementById("overlay");
+const modalTitle = document.getElementById("modalTitle");
+const modalBody  = document.getElementById("modalBody");
 
-document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
 document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
-document.getElementById("restartBtn").onclick = ()=> boot();
-document.getElementById("startBtn").onclick = ()=> { if(!state.running) startGame(); };
+document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
 
 /* =========================================================
-   TUNING (learner-friendly pacing)
+   Canvas
    ========================================================= */
-const GRAVITY = 0.78;
-const JUMP_VEL = -13.8;
-const MAX_SPEED = 3.0;
-const ACCEL = 0.55;
-const GROUND_FRICTION = 0.82;
-const AIR_FRICTION = 0.93;
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
 
-const CAMERA_LERP = 0.12;
+function fitCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  canvas.width = Math.floor(rect.width * dpr);
+  canvas.height = Math.floor(rect.height * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener("resize", ()=>{ fitCanvas(); initSky(); });
 
-const QUESTIONS_PER_RUN = 7;
-const QUIZ_TIMEOUT_MS = 9000;
+/* =========================================================
+   Game tuning (LOW SPEED + SAFE SPACING)
+   ========================================================= */
+const READ_PAUSE_MS = 1200;   // freeze runner to read
+const RUN_SPEED = 2.0;        // low speed (world px per frame-ish)
+const GRAVITY = 0.85;
+const JUMP_VEL = -14.0;
+const AIR_CONTROL = 0.20;     // small left/right adjust
+const GROUND_CONTROL = 0.45;
+
+const QUESTION_TIMEOUT_MS = 13000;
 const FEEDBACK_MS = 950;
-const SAFE_FALL_Y = 1400;
-const LEVEL_END_X = 5200;
+
+const BLOCK_HIT_MARGIN = 6;   // forgiveness
+const QUESTIONS_PER_RUN = 6;
 
 /* =========================================================
-   LEVEL
+   Responsive world (NO hard-coded 430)
    ========================================================= */
-function makeLevel(){
-  const platforms = [];
-  // ground segments with gaps
-  platforms.push({x:0,y:430,w:950,h:60});
-  platforms.push({x:1030,y:430,w:950,h:60});
-  platforms.push({x:2100,y:430,w:950,h:60});
-  platforms.push({x:3200,y:430,w:950,h:60});
-  platforms.push({x:4350,y:430,w:950,h:60});
+function getWorldMetrics(){
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width;
+  const H = rect.height;
 
-  // a few safe upper platforms
-  platforms.push({x:520,y:340,w:210,h:22});
-  platforms.push({x:1520,y:330,w:250,h:22});
-  platforms.push({x:2620,y:325,w:250,h:22});
-  platforms.push({x:3780,y:335,w:250,h:22});
-  platforms.push({x:4680,y:320,w:230,h:22});
+  const groundThickness = clamp(Math.round(H*0.12), 46, 72);
+  const groundY = H - groundThickness;
 
-  const checkpoints = [
-    {x:640, used:false},
-    {x:1540, used:false},
-    {x:2660, used:false},
-    {x:3820, used:false},
-    {x:4700, used:false},
-  ];
+  const playerH = clamp(Math.round(H*0.12), 54, 82);
+  const playerW = Math.round(playerH*0.72);
 
-  const coins = [];
-  const coinLine = (x0,y0,n,dx)=>{ for(let i=0;i<n;i++) coins.push({x:x0+i*dx,y:y0,r:9,taken:false}); };
-  coinLine(200,380,6,42);
-  coinLine(560,300,4,42);
-  coinLine(1160,380,6,42);
-  coinLine(2280,380,6,42);
-  coinLine(3380,380,6,42);
-  coinLine(4480,380,6,42);
-
-  return {platforms, checkpoints, coins};
+  return {W,H,groundY,groundThickness,playerW,playerH};
 }
 
 /* =========================================================
-   STATE
+   Sky decor
+   ========================================================= */
+let stars=[];
+function initSky(){
+  const {W,H} = getWorldMetrics();
+  stars=[];
+  for(let i=0;i<90;i++){
+    stars.push({x:Math.random()*W, y:Math.random()*H*0.70, r:0.8+Math.random()*1.6, tw:Math.random()*6.28});
+  }
+}
+
+/* =========================================================
+   State
    ========================================================= */
 const state = {
   running:false,
-  phase:"menu",        // menu | play | quiz | end
+  phase:"menu", // menu | run | question | feedback | end
   score:0,
   coins:0,
   correct:0,
   attempted:0,
+
   questions:[],
   qIndex:0,
   current:null,
-  quizStart:0,
-  log:[],
-  popUntil:0,
-  cameraX:0,
-  lastSafeX:80,
-  lastSafeY:280,
 
-  // visuals
-  floatPop: [],        // +1, +10 etc
-  particles: [],       // sparkles
+  cameraX:0,
+  worldX:0, // player world position x (continuous forward)
+
+  readUntil:0,
+  questionStart:0,
+
+  blocks:[], // active option blocks for current question
+  answered:false,
+
+  floatPop:[],
+  particles:[],
+
+  log:[]
 };
 
 function updateHUD(){
@@ -448,6 +426,61 @@ function updateHUD(){
   qtotalEl.textContent = String(state.questions.length);
 }
 
+/* =========================================================
+   Player
+   ========================================================= */
+const player = {
+  x:120, y:0,
+  w:44, h:64,
+  vx:0, vy:0,
+  onGround:false,
+  t:0
+};
+
+function resetPlayer(){
+  const m = getWorldMetrics();
+  player.w = m.playerW;
+  player.h = m.playerH;
+  player.x = Math.round(m.W*0.25);
+  player.y = m.groundY - player.h;
+  player.vx = 0;
+  player.vy = 0;
+  player.onGround = true;
+  player.t = 0;
+  state.worldX = 0;
+  state.cameraX = 0;
+}
+
+/* =========================================================
+   Input
+   ========================================================= */
+const input = {left:false, right:false, jump:false};
+
+window.addEventListener("keydown",(e)=>{
+  const k=e.code;
+  if(["ArrowLeft","ArrowRight","ArrowUp","Space","KeyA","KeyD"].includes(k)) e.preventDefault();
+  if(k==="ArrowLeft"||k==="KeyA") input.left=true;
+  if(k==="ArrowRight"||k==="KeyD") input.right=true;
+  if(k==="ArrowUp"||k==="Space") input.jump=true;
+});
+window.addEventListener("keyup",(e)=>{
+  const k=e.code;
+  if(k==="ArrowLeft"||k==="KeyA") input.left=false;
+  if(k==="ArrowRight"||k==="KeyD") input.right=false;
+});
+
+function bindHold(btn, onDown, onUp){
+  btn.addEventListener("pointerdown",(e)=>{ e.preventDefault(); onDown(); });
+  btn.addEventListener("pointerup",(e)=>{ e.preventDefault(); onUp(); });
+  btn.addEventListener("pointercancel",(e)=>{ e.preventDefault(); onUp(); });
+}
+bindHold(document.getElementById("leftBtn"), ()=>input.left=true, ()=>input.left=false);
+bindHold(document.getElementById("rightBtn"),()=>input.right=true,()=>input.right=false);
+document.getElementById("jumpBtn").addEventListener("pointerdown",(e)=>{ e.preventDefault(); input.jump=true; });
+
+/* =========================================================
+   Question UI
+   ========================================================= */
 function renderQuestion(q){
   state.current = q;
   topicBadge.textContent = q.topic;
@@ -464,82 +497,213 @@ function showPopup(ok, correctKey, why){
   popupEl.style.display = "block";
   popupEl.innerHTML = (ok ? "✅ Correct! (+10)" : "❌ Wrong!") +
     `<span class="why">Correct: ${correctKey}. ${escapeHtml(why)}</span>`;
-  state.popUntil = performance.now() + FEEDBACK_MS;
+  setTimeout(()=> popupEl.style.display="none", FEEDBACK_MS);
 }
 
 /* =========================================================
-   CANVAS
+   Blocks (A/B/C) — spaced along X (NOT continuous)
    ========================================================= */
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
+function spawnOptionBlocks(){
+  const m = getWorldMetrics();
+  const blockH = clamp(Math.round(m.H*0.10), 40, 58);
+  const blockW = clamp(Math.round(m.W*0.10), 68, 92);
 
-function fitCanvas(){
-  const rect = canvas.getBoundingClientRect();
-  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  canvas.width = Math.floor(rect.width * dpr);
-  canvas.height = Math.floor(rect.height * dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-window.addEventListener("resize", ()=>{ fitCanvas(); initParallax(); });
+  // "Appropriate spacing": big enough to land + decide
+  const gap = clamp(Math.round(m.W*0.16), 110, 160);
 
-let stars=[], clouds=[], hills=[];
-function initParallax(){
-  const rect = canvas.getBoundingClientRect();
-  const W = rect.width, H = rect.height;
+  // spawn ahead so learner sees them coming (after read pause)
+  const spawnWorldX = state.worldX + Math.round(m.W*0.75);
 
-  stars=[];
-  for(let i=0;i<95;i++){
-    stars.push({x:Math.random()*W, y:Math.random()*H*0.55, r:0.7+Math.random()*1.7, s:0.25+Math.random()*1.0});
-  }
-  clouds=[];
-  for(let i=0;i<10;i++){
-    clouds.push({x:Math.random()*6000, y:42+Math.random()*160, w:130+Math.random()*190, h:30+Math.random()*38, sp:0.06+Math.random()*0.10});
-  }
-  hills=[];
-  for(let i=0;i<9;i++){
-    hills.push({x:i*850 + Math.random()*260, y:320+Math.random()*70, w:640+Math.random()*300, h:210+Math.random()*170});
-  }
+  const y = m.groundY - blockH;
+
+  state.blocks = [
+    makeBlock("A", spawnWorldX + 0*(blockW+gap), y, blockW, blockH),
+    makeBlock("B", spawnWorldX + 1*(blockW+gap), y, blockW, blockH),
+    makeBlock("C", spawnWorldX + 2*(blockW+gap), y, blockW, blockH),
+  ];
+
+  state.answered = false;
 }
 
-let world = makeLevel();
-
-/* Player */
-const player = {
-  x:80, y:280, w:40, h:54,
-  vx:0, vy:0,
-  onGround:false,
-
-  // sprite-ish animation
-  t:0,
-  faceDir:1, // 1 right, -1 left
-};
-
-/* Input */
-const input = {left:false, right:false, jumpQueued:false};
-window.addEventListener("keydown",(e)=>{
-  const k=e.code;
-  if(["ArrowLeft","ArrowRight","ArrowUp","Space","KeyA","KeyD"].includes(k)) e.preventDefault();
-  if(k==="ArrowLeft"||k==="KeyA") input.left=true;
-  if(k==="ArrowRight"||k==="KeyD") input.right=true;
-  if(k==="ArrowUp"||k==="Space") input.jumpQueued=true;
-});
-window.addEventListener("keyup",(e)=>{
-  const k=e.code;
-  if(k==="ArrowLeft"||k==="KeyA") input.left=false;
-  if(k==="ArrowRight"||k==="KeyD") input.right=false;
-});
-
-/* Mobile buttons */
-function bindHold(btn, onDown, onUp){
-  btn.addEventListener("pointerdown",(e)=>{ e.preventDefault(); onDown(); });
-  btn.addEventListener("pointerup",(e)=>{ e.preventDefault(); onUp(); });
-  btn.addEventListener("pointercancel",(e)=>{ e.preventDefault(); onUp(); });
+function makeBlock(key, x, y, w, h){
+  const color = key==="A" ? css("--a") : key==="B" ? css("--b") : css("--c");
+  return {key, x, y, w, h, color, hit:false, bounce:0};
 }
-bindHold(document.getElementById("leftBtn"), ()=>input.left=true, ()=>input.left=false);
-bindHold(document.getElementById("rightBtn"),()=>input.right=true,()=>input.right=false);
-document.getElementById("jumpBtn").addEventListener("pointerdown",(e)=>{ e.preventDefault(); input.jumpQueued=true; });
 
-/* Helpers */
+/* =========================================================
+   VFX
+   ========================================================= */
+function addFloatPop(worldX, y, text, color, ms=650){
+  state.floatPop.push({x:worldX, y, text, color, until: performance.now()+ms});
+}
+function addBurst(worldX, y, color){
+  for(let i=0;i<14;i++){
+    const ang = Math.random()*Math.PI*2;
+    const sp = 1.5 + Math.random()*2.6;
+    state.particles.push({
+      x:worldX, y,
+      vx: Math.cos(ang)*sp,
+      vy: Math.sin(ang)*sp - 1.2,
+      born: performance.now(),
+      life: 520 + Math.random()*260,
+      color,
+      r: 1.6 + Math.random()*2.4
+    });
+  }
+}
+
+/* =========================================================
+   Collision (player vs block)
+   We count collision when player hits front/side with forgiveness.
+   ========================================================= */
+function rectsOverlap(a,b){
+  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+}
+
+function checkBlockCollisions(now){
+  if(state.phase !== "question") return;
+  if(state.answered) return;
+
+  const m = getWorldMetrics();
+  const pxWorldLeft = state.worldX + player.x - state.worldX; // keep simple: player.x is screen-space; worldX is tracked separately
+  // Actually, our world system is: player stays around screen x, worldX increases.
+  // The player's world x is state.worldX + player.x.
+  const playerWorldX = state.worldX + player.x;
+
+  const pr = {
+    x: playerWorldX,
+    y: player.y,
+    w: player.w,
+    h: player.h
+  };
+
+  for(const b of state.blocks){
+    if(b.hit) continue;
+
+    const br = {x:b.x, y:b.y, w:b.w, h:b.h};
+
+    // forgiveness: shrink collision slightly so tiny corner touches don't punish
+    const shrunk = {
+      x: br.x + BLOCK_HIT_MARGIN,
+      y: br.y + 2,
+      w: br.w - 2*BLOCK_HIT_MARGIN,
+      h: br.h - 4
+    };
+
+    if(rectsOverlap(pr, shrunk)){
+      b.hit = true;
+      b.bounce = now + 180;
+
+      // handle answer
+      handleAnswer(b.key);
+      break;
+    }
+  }
+}
+
+/* =========================================================
+   Answer / flow
+   ========================================================= */
+function handleAnswer(selectedKey){
+  const q = state.current;
+  const ok = (selectedKey === q.correct);
+
+  state.attempted++;
+  if(ok){
+    state.correct++;
+    state.score += 10;
+    addFloatPop(state.worldX + player.x + player.w/2, player.y - 14, "+10", "rgba(57,217,138,.95)", 700);
+    addBurst(state.worldX + player.x + player.w/2, player.y + 10, "rgba(57,217,138,.95)");
+  }else{
+    addFloatPop(state.worldX + player.x + player.w/2, player.y - 14, "0", "rgba(255,255,255,.85)", 650);
+    addBurst(state.worldX + player.x + player.w/2, player.y + 10, "rgba(255,92,122,.95)");
+  }
+
+  updateHUD();
+  showPopup(ok, q.correct, q.why);
+
+  const rt = Math.max(0, Math.round(performance.now() - state.questionStart));
+  state.log.push({
+    ts: new Date().toISOString(),
+    qid: q.id,
+    topic: q.topic,
+    selected: selectedKey,
+    correct: q.correct,
+    is_correct: ok ? 1 : 0,
+    response_ms: rt,
+    score_after: state.score
+  });
+
+  state.answered = true;
+  state.phase = "feedback";
+
+  setTimeout(()=> nextQuestion(), FEEDBACK_MS);
+}
+
+function autoNoAnswer(){
+  if(state.phase !== "question") return;
+  if(state.answered) return;
+
+  const q = state.current;
+  state.attempted++;
+  updateHUD();
+  showPopup(false, q.correct, "No answer recorded.");
+
+  state.log.push({
+    ts: new Date().toISOString(),
+    qid: q.id,
+    topic: q.topic,
+    selected: "NA",
+    correct: q.correct,
+    is_correct: 0,
+    response_ms: QUESTION_TIMEOUT_MS,
+    score_after: state.score
+  });
+
+  state.phase = "feedback";
+  state.answered = true;
+  setTimeout(()=> nextQuestion(), FEEDBACK_MS);
+}
+
+function startQuestion(){
+  if(state.qIndex >= state.questions.length){
+    endGame();
+    return;
+  }
+  const q = state.questions[state.qIndex++];
+  renderQuestion(q);
+
+  state.phase = "question";
+  topicBadge.textContent = "Question";
+  state.readUntil = performance.now() + READ_PAUSE_MS;
+  state.questionStart = performance.now();
+  state.blocks = [];
+  state.answered = false;
+
+  // after read pause, spawn blocks
+  setTimeout(()=>{
+    if(state.phase === "question" && !state.answered){
+      spawnOptionBlocks();
+    }
+  }, READ_PAUSE_MS);
+
+  // timeout
+  setTimeout(()=> autoNoAnswer(), QUESTION_TIMEOUT_MS);
+}
+
+function nextQuestion(){
+  popupEl.style.display="none";
+  state.blocks = [];
+  state.phase = "run";
+  topicBadge.textContent = "Running";
+
+  // tiny gap before next question
+  setTimeout(()=> startQuestion(), 650);
+}
+
+/* =========================================================
+   Drawing
+   ========================================================= */
 function roundRect(x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y);
@@ -549,342 +713,29 @@ function roundRect(x,y,w,h,r){
   ctx.arcTo(x,y,x+w,y,r);
   ctx.closePath();
 }
-function aabb(a,b){
-  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
-}
 
-/* =========================================================
-   COLLISIONS
-   ========================================================= */
-function resolvePlatforms(){
-  player.onGround=false;
-  for(const pl of world.platforms){
-    if(player.x+player.w<pl.x || player.x>pl.x+pl.w) continue;
-    if(player.y+player.h<pl.y || player.y>pl.y+pl.h) continue;
-
-    const ox1=(pl.x+pl.w)-player.x;
-    const ox2=(player.x+player.w)-pl.x;
-    const oy1=(pl.y+pl.h)-player.y;
-    const oy2=(player.y+player.h)-pl.y;
-    const ox=Math.min(ox1,ox2);
-    const oy=Math.min(oy1,oy2);
-
-    if(ox<oy){
-      if(player.x<pl.x) player.x-=ox; else player.x+=ox;
-      player.vx=0;
-    }else{
-      if(player.y<pl.y){
-        player.y-=oy;
-        player.vy=0;
-        player.onGround=true;
-        state.lastSafeX=player.x;
-        state.lastSafeY=player.y;
-      }else{
-        player.y+=oy;
-        player.vy=0;
-      }
-    }
-  }
-}
-
-function getGroundYBelowPlayer(){
-  const footX = player.x + player.w/2;
-  let best = null;
-  for(const pl of world.platforms){
-    if(pl.temp) continue;
-    if(footX < pl.x-2 || footX > pl.x+pl.w+2) continue;
-    const top = pl.y;
-    if(top >= player.y + player.h - 3 && top <= player.y + player.h + 80){
-      if(best === null || top < best) best = top;
-    }
-  }
-  return best ?? 430;
-}
-
-/* =========================================================
-   VFX: float pop + particles
-   ========================================================= */
-function addFloatPop(x,y,text,color,ms=650){
-  state.floatPop.push({x,y,text,color,until: performance.now()+ms});
-}
-function addBurst(x,y,baseColor){
-  for(let i=0;i<14;i++){
-    const ang = Math.random()*Math.PI*2;
-    const sp = 1.6 + Math.random()*2.8;
-    state.particles.push({
-      x,y,
-      vx: Math.cos(ang)*sp,
-      vy: Math.sin(ang)*sp - 1.2,
-      life: 520 + Math.random()*240,
-      born: performance.now(),
-      color: baseColor,
-      r: 1.6 + Math.random()*2.4
-    });
-  }
-}
-
-/* =========================================================
-   QUIZ BRICKS (Mario-like bounce, guaranteed visibility)
-   ========================================================= */
-let quizBricks=[];   // {key,x,y,w,h,hit,bounceUntil}
-let quizArea=null;   // {x0,x1}
-let quizPad=null;    // temporary platform under player (invisible)
-
-function cleanupQuizSupport(){
-  if(quizPad){
-    const idx = world.platforms.indexOf(quizPad);
-    if(idx>=0) world.platforms.splice(idx,1);
-    quizPad=null;
-  }
-}
-
-function spawnQuizBricks(){
-  // stabilize player
-  const gy = getGroundYBelowPlayer();
-  player.y = gy - player.h;
-  player.vy = 0;
-  player.onGround = true;
-
-  // temporary pad to avoid edge/pit frustration
-  quizPad = {x: player.x - 160, y: gy, w: 520, h: 18, temp:true};
-  world.platforms.push(quizPad);
-
-  const bw=58, bh=48, gap=18;
-
-  // choose quiz center near player
-  const quizCenterX = player.x + 220;
-  const rowY = Math.max(gy - 150, 150);
-
-  const startX = quizCenterX - (bw*3 + gap*2)/2;
-
-  quizBricks = [
-    {key:"A", x:startX,              y:rowY, w:bw, h:bh, hit:false, bounceUntil:0},
-    {key:"B", x:startX + (bw+gap),   y:rowY, w:bw, h:bh, hit:false, bounceUntil:0},
-    {key:"C", x:startX + (bw+gap)*2, y:rowY, w:bw, h:bh, hit:false, bounceUntil:0},
-  ];
-
-  // teleport player under B
-  const underB = startX + (bw+gap) + bw/2 - player.w/2;
-  player.x = underB;
-  player.vx = 0;
-
-  // clamp zone
-  quizArea = {x0: startX - 160, x1: startX + (bw+gap)*2 + bw + 160};
-
-  // snap camera to quiz zone so player never disappears
-  const rect = canvas.getBoundingClientRect();
-  const W = rect.width;
-  const mid = (quizArea.x0 + quizArea.x1)/2;
-  state.cameraX = Math.max(0, mid - W/2);
-}
-
-function checkBrickHit(){
-  if(state.phase!=="quiz") return;
-
-  const head = {x:player.x+6, y:player.y-6, w:player.w-12, h:10};
-  for(const b of quizBricks){
-    if(b.hit) continue;
-
-    // bottom band of brick
-    const bottom = {x:b.x, y:b.y+b.h-6, w:b.w, h:10};
-    if(player.vy < -1 && aabb(head, bottom)){
-      b.hit = true;
-      b.bounceUntil = performance.now() + 180;
-      addBurst(b.x + b.w/2, b.y + b.h, "rgba(255,255,255,.95)");
-      handleAnswer(b.key);
-      break;
-    }
-  }
-}
-
-function drawBrick(b, now){
-  const col = b.key==="A" ? getCss("--a") : b.key==="B" ? getCss("--b") : getCss("--c");
-  const t = b.bounceUntil > now ? (1 - (b.bounceUntil - now)/180) : 1;
-  const bounce = b.bounceUntil > now ? Math.sin(t*Math.PI)*10 : 0;
-
-  const x = b.x;
-  const y = b.y - bounce;
-  const w = b.w, h = b.h;
-
-  ctx.save();
-  ctx.globalAlpha = b.hit ? 0.30 : 0.98;
-
-  // outer
-  const grad = ctx.createLinearGradient(x,y,x,y+h);
-  grad.addColorStop(0, col);
-  grad.addColorStop(1, "rgba(0,0,0,.10)");
-  ctx.fillStyle = grad;
-  roundRect(x,y,w,h,10);
-  ctx.fill();
-
-  // inner bevel
-  ctx.globalAlpha *= 0.65;
-  ctx.strokeStyle = "rgba(255,255,255,.55)";
-  ctx.lineWidth = 2;
-  roundRect(x+3,y+3,w-6,h-6,8);
-  ctx.stroke();
-
-  // brick grid texture
-  ctx.globalAlpha *= 0.7;
-  ctx.strokeStyle = "rgba(7,16,37,.35)";
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.moveTo(x + w/2, y+7);
-  ctx.lineTo(x + w/2, y+h-7);
-  ctx.stroke();
-  for(let i=1;i<=2;i++){
-    ctx.beginPath();
-    ctx.moveTo(x+7, y+i*(h/3));
-    ctx.lineTo(x+w-7, y+i*(h/3));
-    ctx.stroke();
-  }
-
-  // label
-  ctx.globalAlpha = b.hit ? 0.35 : 1;
-  ctx.fillStyle = "rgba(7,16,37,.92)";
-  ctx.font = "950 22px system-ui,Segoe UI,Arial";
-  ctx.fillText(b.key, x + w/2 - 7, y + 31);
-
-  ctx.restore();
-}
-
-/* =========================================================
-   QUESTIONS FLOW
-   ========================================================= */
-function prepareQuestions(){
-  const s = shuffle(QUESTION_BANK);
-  state.questions = s.slice(0, Math.min(QUESTIONS_PER_RUN, s.length));
-  state.qIndex = 0;
-  qtotalEl.textContent = String(state.questions.length);
-}
-
-function startQuiz(){
-  if(state.qIndex >= state.questions.length) return false;
-
-  // ensure stable ground to keep friction low and predictable
-  if(!player.onGround) return false;
-
-  const q = state.questions[state.qIndex++];
-  renderQuestion(q);
-
-  state.phase = "quiz";
-  state.quizStart = performance.now();
-  topicBadge.textContent = "Question";
-
-  // freeze drift
-  player.vx = 0;
-
-  spawnQuizBricks();
-
-  // timer
-  setTimeout(()=>{ if(state.phase==="quiz") autoNoAnswer(); }, QUIZ_TIMEOUT_MS);
-  return true;
-}
-
-function handleAnswer(selected){
-  const q = state.current;
-  const ok = (selected === q.correct);
-
-  state.attempted += 1;
-  if(ok){
-    state.correct += 1;
-    state.score += 10;
-    addFloatPop(player.x + player.w/2, player.y - 18, "+10", "rgba(57,217,138,.95)", 700);
-    addBurst(player.x + player.w/2, player.y, "rgba(57,217,138,.95)");
-  }else{
-    addBurst(player.x + player.w/2, player.y, "rgba(255,92,122,.95)");
-  }
-
-  updateHUD();
-  showPopup(ok, q.correct, q.why);
-
-  const rt = Math.max(0, Math.round(performance.now() - state.quizStart));
-  state.log.push({
-    ts: new Date().toISOString(),
-    qid: q.id,
-    topic: q.topic,
-    selected,
-    correct: q.correct,
-    is_correct: ok ? 1 : 0,
-    response_ms: rt,
-    score_after: state.score,
-    coins: state.coins
-  });
-
-  setTimeout(()=>{
-    quizBricks = [];
-    quizArea = null;
-    cleanupQuizSupport();
-    state.phase = "play";
-    topicBadge.textContent = "Running";
-  }, FEEDBACK_MS + 120);
-}
-
-function autoNoAnswer(){
-  if(state.phase !== "quiz") return;
-  const q = state.current;
-
-  state.attempted += 1;
-  updateHUD();
-  showPopup(false, q.correct, "No answer recorded.");
-  addFloatPop(player.x + player.w/2, player.y - 18, "NA", "rgba(255,255,255,.80)", 700);
-
-  state.log.push({
-    ts: new Date().toISOString(),
-    qid: q.id,
-    topic: q.topic,
-    selected: "NA",
-    correct: q.correct,
-    is_correct: 0,
-    response_ms: QUIZ_TIMEOUT_MS,
-    score_after: state.score,
-    coins: state.coins
-  });
-
-  setTimeout(()=>{
-    quizBricks = [];
-    quizArea = null;
-    cleanupQuizSupport();
-    state.phase = "play";
-    topicBadge.textContent = "Running";
-  }, FEEDBACK_MS + 120);
-}
-
-/* =========================================================
-   DRAWING: upgraded Mario-ish tiles + player sprite + coins
-   ========================================================= */
-function drawBackground(W,H, now){
+function drawSky(now, W, H){
   // stars
-  ctx.fillStyle="rgba(255,255,255,.88)";
-  for(const st of stars){
-    const x = (st.x + (state.cameraX*0.10)*st.s) % W;
-    const tw = 0.5 + 0.5*Math.sin((now/700) + st.x*0.02);
-    ctx.globalAlpha = 0.35 + tw*0.55;
+  for(const s of stars){
+    const tw = 0.45 + 0.55*Math.sin(now/700 + s.tw);
+    ctx.globalAlpha = 0.25 + tw*0.65;
+    ctx.fillStyle = "rgba(255,255,255,.95)";
     ctx.beginPath();
-    ctx.arc(x, st.y, st.r, 0, Math.PI*2);
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
     ctx.fill();
   }
-  ctx.globalAlpha=1;
+  ctx.globalAlpha = 1;
 
-  // hills
-  ctx.globalAlpha=0.18;
-  ctx.fillStyle="rgba(100,181,255,.90)";
-  for(const h of hills){
-    const x = h.x - state.cameraX*0.14;
-    ctx.beginPath();
-    ctx.ellipse(x, h.y, h.w/2, h.h/2, 0, 0, Math.PI*2);
-    ctx.fill();
-  }
-  ctx.globalAlpha=1;
-
-  // clouds
-  for(const cl of clouds){
-    const cx = cl.x - state.cameraX*cl.sp;
-    const wob = Math.sin(now/1100 + cl.x*0.004)*2.0;
-    ctx.fillStyle="rgba(255,255,255,.10)";
-    roundRect(cx, cl.y + wob, cl.w, cl.h, 20);
-    ctx.fill();
-  }
+  // soft hills
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = "rgba(100,181,255,.9)";
+  ctx.beginPath();
+  ctx.ellipse(W*0.15, H*0.95, W*0.55, H*0.55, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(W*0.92, H*1.02, W*0.55, H*0.45, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
 
   // subtle horizon glow
   const g = ctx.createLinearGradient(0,0,0,H);
@@ -894,202 +745,161 @@ function drawBackground(W,H, now){
   ctx.fillRect(0,0,W,H);
 }
 
-function drawPlatform(pl){
-  if(pl.temp) return; // keep quiz pad invisible
-  // base
-  const base = ctx.createLinearGradient(0, pl.y, 0, pl.y+pl.h);
-  base.addColorStop(0, getCss("--ground2"));
-  base.addColorStop(1, getCss("--ground1"));
+function drawGround(W, H, groundY, thick){
+  // ground
+  const base = ctx.createLinearGradient(0, groundY, 0, groundY+thick);
+  base.addColorStop(0, "rgba(46,101,196,.92)");
+  base.addColorStop(1, "rgba(20,35,74,.92)");
   ctx.fillStyle = base;
-  roundRect(pl.x, pl.y, pl.w, pl.h, 16);
+  roundRect(0, groundY, W, thick, 16);
   ctx.fill();
 
-  // grass strip
-  ctx.fillStyle = getCss("--grass");
-  roundRect(pl.x+7, pl.y+7, pl.w-14, 12, 8);
-  ctx.fill();
-
-  // pixel-ish tiles pattern
-  ctx.globalAlpha = 0.18;
+  // tile-ish pattern
+  ctx.globalAlpha = 0.12;
   ctx.fillStyle = "white";
-  for(let x=pl.x+14; x<pl.x+pl.w-14; x+=34){
-    ctx.fillRect(x, pl.y+24, 14, 10);
+  for(let x=16; x<W; x+=34){
+    ctx.fillRect(x, groundY+18, 14, 10);
   }
   ctx.globalAlpha = 1;
-
-  // little edge shading
-  ctx.globalAlpha = 0.25;
-  ctx.fillStyle = "rgba(0,0,0,.6)";
-  ctx.fillRect(pl.x, pl.y+pl.h-10, pl.w, 10);
-  ctx.globalAlpha = 1;
-}
-
-function drawPlatforms(){
-  for(const pl of world.platforms) drawPlatform(pl);
-}
-
-function drawCoins(now){
-  for(const c of world.coins){
-    if(c.taken) continue;
-    const wob = Math.sin(now/170 + c.x*0.02)*3.0;
-    const spin = 0.35 + 0.65*Math.abs(Math.sin(now/220 + c.x*0.01));
-    const rw = c.r * spin;
-
-    // glow
-    const glow = ctx.createRadialGradient(c.x, c.y+wob, 2, c.x, c.y+wob, c.r*2.4);
-    glow.addColorStop(0,"rgba(255,219,120,.95)");
-    glow.addColorStop(1,"rgba(255,219,120,.06)");
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(c.x, c.y+wob, c.r*1.1, 0, Math.PI*2);
-    ctx.fill();
-
-    // coin body
-    const body = ctx.createLinearGradient(c.x-rw, c.y+wob-c.r, c.x+rw, c.y+wob+c.r);
-    body.addColorStop(0,"rgba(255,230,160,.95)");
-    body.addColorStop(0.55,"rgba(255,200,80,.95)");
-    body.addColorStop(1,"rgba(255,240,190,.90)");
-    ctx.fillStyle = body;
-
-    ctx.beginPath();
-    ctx.ellipse(c.x, c.y+wob, Math.max(2.5, rw), c.r, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // rim
-    ctx.strokeStyle = "rgba(255,255,255,.40)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.ellipse(c.x, c.y+wob, Math.max(2.5, rw), c.r, 0, 0, Math.PI*2);
-    ctx.stroke();
-
-    // shine
-    ctx.globalAlpha = 0.30;
-    ctx.fillStyle="white";
-    ctx.beginPath();
-    ctx.ellipse(c.x-3, c.y+wob-4, 3, 4, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-}
-
-function drawGoal(){
-  ctx.strokeStyle="rgba(255,255,255,.55)";
-  ctx.lineWidth=4;
-  ctx.beginPath();
-  ctx.moveTo(LEVEL_END_X, 250);
-  ctx.lineTo(LEVEL_END_X, 430);
-  ctx.stroke();
-
-  ctx.fillStyle="rgba(57,217,138,.90)";
-  roundRect(LEVEL_END_X, 260, 86, 44, 12);
-  ctx.fill();
-
-  ctx.fillStyle="rgba(7,16,37,.95)";
-  ctx.font="900 14px system-ui,Segoe UI,Arial";
-  ctx.fillText("FINISH", LEVEL_END_X+14, 288);
 }
 
 function drawPlayer(now){
-  player.t += 0.12 + Math.min(0.18, Math.abs(player.vx)*0.06);
-  if(player.vx > 0.3) player.faceDir = 1;
-  if(player.vx < -0.3) player.faceDir = -1;
+  // improved silhouette: head/helmet + body + legs + outline
+  player.t += 0.12 + Math.min(0.20, Math.abs(player.vx)*0.08);
+
+  const x = player.x;
+  const y = player.y;
+  const w = player.w;
+  const h = player.h;
 
   // shadow
-  ctx.fillStyle="rgba(0,0,0,.32)";
+  ctx.fillStyle="rgba(0,0,0,.30)";
   ctx.beginPath();
-  ctx.ellipse(player.x+player.w/2, player.y+player.h+12, 18, 6, 0, 0, Math.PI*2);
+  ctx.ellipse(x+w*0.5, y+h+10, w*0.42, 6, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // body (helmet + suit)
-  const bx = player.x, by = player.y, bw = player.w, bh = player.h;
+  // helmet (bigger, clearer)
+  const headR = Math.max(14, w*0.45);
+  const hx = x + w*0.5;
+  const hy = y + h*0.28;
 
-  // suit
-  const suit = ctx.createLinearGradient(bx,by,bx,bh+by);
-  suit.addColorStop(0,"rgba(235,245,255,.95)");
-  suit.addColorStop(1,"rgba(170,210,255,.78)");
-  ctx.fillStyle = suit;
-  roundRect(bx,by,bw,bh,14);
+  const headGrad = ctx.createLinearGradient(hx-headR, hy-headR, hx+headR, hy+headR);
+  headGrad.addColorStop(0,"rgba(255,255,255,.98)");
+  headGrad.addColorStop(1,"rgba(170,210,255,.85)");
+  ctx.fillStyle = headGrad;
+  ctx.beginPath();
+  ctx.arc(hx, hy, headR, 0, Math.PI*2);
+  ctx.fill();
+
+  // visor
+  const vg = ctx.createLinearGradient(hx-headR*0.6, hy-headR*0.2, hx+headR*0.6, hy+headR*0.4);
+  vg.addColorStop(0,"rgba(51,214,255,.70)");
+  vg.addColorStop(1,"rgba(124,92,255,.55)");
+  ctx.fillStyle = vg;
+  roundRect(hx-headR*0.62, hy-headR*0.18, headR*1.24, headR*0.56, 10);
+  ctx.fill();
+
+  // body (clear torso)
+  const bodyTop = y + h*0.42;
+  const bodyH = h*0.52;
+  const bodyGrad = ctx.createLinearGradient(x, bodyTop, x, bodyTop+bodyH);
+  bodyGrad.addColorStop(0,"rgba(235,245,255,.95)");
+  bodyGrad.addColorStop(1,"rgba(150,195,255,.80)");
+  ctx.fillStyle = bodyGrad;
+  roundRect(x+w*0.10, bodyTop, w*0.80, bodyH, 16);
   ctx.fill();
 
   // belt
   ctx.globalAlpha = 0.55;
-  ctx.fillStyle="rgba(7,16,37,.90)";
-  roundRect(bx+6, by+bh*0.58, bw-12, 8, 6);
+  ctx.fillStyle="rgba(7,16,37,.92)";
+  roundRect(x+w*0.18, bodyTop+bodyH*0.45, w*0.64, 8, 6);
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  // visor
-  const v = ctx.createLinearGradient(bx+6,by+10,bx+bw-6,by+28);
-  v.addColorStop(0,"rgba(80,220,255,.72)");
-  v.addColorStop(1,"rgba(124,92,255,.55)");
-  ctx.fillStyle=v;
-  roundRect(bx+6,by+12,bw-12,16,10);
-  ctx.fill();
-
-  // outline glow
-  ctx.strokeStyle="rgba(100,181,255,.42)";
-  ctx.lineWidth=2;
-  roundRect(bx,by,bw,bh,14);
-  ctx.stroke();
-
-  // arms (simple)
+  // arms (chunkier for visibility)
+  const armSwing = Math.sin(player.t)*6;
   ctx.strokeStyle="rgba(255,255,255,.85)";
-  ctx.lineWidth=6;
+  ctx.lineWidth = Math.max(5, w*0.14);
   ctx.lineCap="round";
-  const armSwing = Math.sin(player.t) * 6;
-  // left arm
   ctx.beginPath();
-  ctx.moveTo(bx+8, by+32);
-  ctx.lineTo(bx+6, by+42+armSwing*0.2);
+  ctx.moveTo(x+w*0.18, bodyTop+bodyH*0.22);
+  ctx.lineTo(x+w*0.10, bodyTop+bodyH*0.40 + armSwing*0.10);
   ctx.stroke();
-  // right arm
   ctx.beginPath();
-  ctx.moveTo(bx+bw-8, by+32);
-  ctx.lineTo(bx+bw-6, by+42-armSwing*0.2);
+  ctx.moveTo(x+w*0.82, bodyTop+bodyH*0.22);
+  ctx.lineTo(x+w*0.90, bodyTop+bodyH*0.40 - armSwing*0.10);
   ctx.stroke();
 
-  // legs
-  const step = Math.sin(player.t) * 7;
-  ctx.strokeStyle="rgba(255,255,255,.88)";
-  ctx.lineWidth=6;
+  // legs (more visible)
+  const step = Math.sin(player.t)*7;
+  ctx.strokeStyle="rgba(255,255,255,.90)";
+  ctx.lineWidth = Math.max(6, w*0.16);
   ctx.beginPath();
-  ctx.moveTo(bx+12, by+bh-6);
-  ctx.lineTo(bx+12+step, by+bh+10);
+  ctx.moveTo(x+w*0.36, y+h-6);
+  ctx.lineTo(x+w*0.36 + step*0.45, y+h+10);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(bx+bw-12, by+bh-6);
-  ctx.lineTo(bx+bw-12-step, by+bh+10);
+  ctx.moveTo(x+w*0.64, y+h-6);
+  ctx.lineTo(x+w*0.64 - step*0.45, y+h+10);
   ctx.stroke();
 
-  // direction indicator (tiny)
-  ctx.globalAlpha = 0.25;
-  ctx.fillStyle="white";
-  if(player.faceDir === 1){
-    ctx.beginPath();
-    ctx.moveTo(bx+bw+6, by+26);
-    ctx.lineTo(bx+bw+18, by+32);
-    ctx.lineTo(bx+bw+6, by+38);
-    ctx.closePath();
+  // outline (high contrast)
+  ctx.strokeStyle="rgba(100,181,255,.55)";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(hx, hy, headR, 0, Math.PI*2);
+  ctx.stroke();
+  roundRect(x+w*0.10, bodyTop, w*0.80, bodyH, 16);
+  ctx.stroke();
+}
+
+function drawBlocks(now){
+  const cam = state.cameraX;
+
+  for(const b of state.blocks){
+    const bounce = (b.bounce && b.bounce > now) ? Math.sin((1 - (b.bounce - now)/180)*Math.PI)*10 : 0;
+    const sx = b.x - cam;
+    const sy = b.y - bounce;
+
+    // glow
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = b.color;
+    roundRect(sx-6, sy-6, b.w+12, b.h+12, 14);
     ctx.fill();
-  }else{
-    ctx.beginPath();
-    ctx.moveTo(bx-6, by+32);
-    ctx.lineTo(bx-18, by+26);
-    ctx.lineTo(bx-18, by+38);
-    ctx.closePath();
+    ctx.globalAlpha = 1;
+
+    // block body
+    const grad = ctx.createLinearGradient(sx,sy,sx,sy+b.h);
+    grad.addColorStop(0, b.color);
+    grad.addColorStop(1, "rgba(0,0,0,.10)");
+    ctx.fillStyle = grad;
+    roundRect(sx, sy, b.w, b.h, 12);
     ctx.fill();
+
+    // bevel
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = "rgba(255,255,255,.55)";
+    ctx.lineWidth = 2;
+    roundRect(sx+3, sy+3, b.w-6, b.h-6, 10);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // label
+    ctx.fillStyle = "rgba(7,16,37,.92)";
+    ctx.font = "950 22px system-ui,Segoe UI,Arial";
+    ctx.fillText(b.key, sx + b.w/2 - 7, sy + b.h/2 + 8);
   }
-  ctx.globalAlpha = 1;
 }
 
 function drawFloatPops(now){
   state.floatPop = state.floatPop.filter(p => now < p.until);
   for(const p of state.floatPop){
-    const t = 1 - ((p.until - now) / 650);
+    const t = 1 - ((p.until - now)/650);
+    const sx = (p.x - state.cameraX);
     ctx.globalAlpha = 1 - t;
     ctx.fillStyle = p.color;
     ctx.font = "900 14px system-ui,Segoe UI,Arial";
-    ctx.fillText(p.text, p.x, p.y - t*18);
+    ctx.fillText(p.text, sx, p.y - t*18);
     ctx.globalAlpha = 1;
   }
 }
@@ -1101,109 +911,80 @@ function drawParticles(now){
     const t = age / pt.life;
     pt.x += pt.vx;
     pt.y += pt.vy;
-    pt.vy += 0.06; // gentle gravity
+    pt.vy += 0.06;
+
+    const sx = pt.x - state.cameraX;
     ctx.globalAlpha = 1 - t;
     ctx.fillStyle = pt.color;
     ctx.beginPath();
-    ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI*2);
+    ctx.arc(sx, pt.y, pt.r, 0, Math.PI*2);
     ctx.fill();
     ctx.globalAlpha = 1;
   }
 }
 
-function drawHUDHint(W,H){
-  if(state.phase==="quiz"){
-    ctx.fillStyle="rgba(255,255,255,.10)";
+function drawHint(now, W, H){
+  if(state.phase === "question"){
+    ctx.fillStyle = "rgba(255,255,255,.10)";
     ctx.fillRect(0, H-40, W, 40);
-    ctx.fillStyle="rgba(234,240,255,.92)";
-    ctx.font="900 12px system-ui,Segoe UI,Arial";
-    ctx.fillText("Quiz paused: jump and hit A / B / C brick.", 12, H-16);
+    ctx.fillStyle = "rgba(234,240,255,.92)";
+    ctx.font = "900 12px system-ui,Segoe UI,Arial";
+    ctx.fillText("Answer: collide with correct block A/B/C. Jump over wrong ones.", 12, H-16);
   }
 }
 
 function draw(now){
-  const rect = canvas.getBoundingClientRect();
-  const W = rect.width, H = rect.height;
-
-  if(popupEl.style.display==="block" && now > state.popUntil) popupEl.style.display="none";
+  const m = getWorldMetrics();
+  const W = m.W, H = m.H;
 
   ctx.clearRect(0,0,W,H);
-  drawBackground(W,H,now);
 
-  // camera transform
-  ctx.save();
-  ctx.translate(-state.cameraX, 0);
+  drawSky(now, W, H);
 
-  drawPlatforms();
-  drawCoins(now);
+  // ground
+  drawGround(W, H, m.groundY, m.groundThickness);
 
-  // subtle checkpoint markers
-  ctx.globalAlpha = 0.08;
-  ctx.strokeStyle = "white";
-  ctx.lineWidth = 2;
-  for(const cp of world.checkpoints){
-    ctx.beginPath();
-    ctx.moveTo(cp.x, 240);
-    ctx.lineTo(cp.x, 430);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
-
-  // quiz bricks
-  if(state.phase==="quiz"){
-    for(const b of quizBricks) drawBrick(b, now);
-
-    if(quizArea){
-      ctx.globalAlpha = 0.05;
-      ctx.fillStyle="white";
-      ctx.fillRect(quizArea.x0, 0, quizArea.x1-quizArea.x0, H);
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  drawGoal();
-  drawPlayer(now);
-
-  // particles + float pops (world space)
+  // blocks + effects are in world-space (camera translate done by subtracting cameraX)
+  drawBlocks(now);
   drawParticles(now);
   drawFloatPops(now);
 
-  ctx.restore();
+  // player is in screen-space (always visible)
+  drawPlayer(now);
 
-  drawHUDHint(W,H);
+  drawHint(now, W, H);
 }
 
 /* =========================================================
-   PHYSICS
+   Physics + camera (player ALWAYS visible)
    ========================================================= */
-function physicsStep(now){
-  if(!state.running || state.phase==="end") return;
+function step(now){
+  if(!state.running) return;
 
-  // movement
-  if(state.phase==="play"){
-    if(input.left)  player.vx -= ACCEL;
-    if(input.right) player.vx += ACCEL;
-  } else if(state.phase==="quiz"){
-    // allow tiny horizontal correction but keep it stable
-    if(input.left)  player.vx -= ACCEL*0.25;
-    if(input.right) player.vx += ACCEL*0.25;
-  }
+  const m = getWorldMetrics();
+  const groundY = m.groundY;
 
-  // friction
-  if(!input.left && !input.right){
-    player.vx *= (player.onGround ? GROUND_FRICTION : AIR_FRICTION);
-  }
+  // reading pause: freeze forward motion so learners can read
+  const inReadPause = (state.phase === "question" && now < state.readUntil);
 
-  // clamp speed
-  const cap = (state.phase==="quiz") ? MAX_SPEED*0.25 : MAX_SPEED;
-  player.vx = clamp(player.vx, -cap, cap);
+  // forward progression: worldX moves, player mostly stays in place on screen
+  const forward = (!inReadPause && (state.phase === "run" || state.phase === "question")) ? RUN_SPEED : 0;
+  state.worldX += forward;
+
+  // small left/right adjust (screen-space)
+  const ctl = player.onGround ? GROUND_CONTROL : AIR_CONTROL;
+  if(input.left)  player.vx -= ctl;
+  if(input.right) player.vx += ctl;
+  player.vx *= 0.88;
+  player.vx = clamp(player.vx, -3.2, 3.2);
 
   // jump
-  if(input.jumpQueued){
-    input.jumpQueued = false;
+  if(input.jump){
+    input.jump = false;
     if(player.onGround){
       player.vy = JUMP_VEL;
       player.onGround = false;
+      addBurst(state.worldX + player.x + player.w/2, player.y + player.h, "rgba(255,255,255,.75)");
     }
   }
 
@@ -1215,209 +996,141 @@ function physicsStep(now){
   player.x += player.vx;
   player.y += player.vy;
 
-  // keep player within world left bound so they never disappear
-  player.x = Math.max(0, player.x);
+  // keep player within visible screen
+  player.x = clamp(player.x, 24, m.W - player.w - 24);
 
-  // quiz clamp
-  if(state.phase==="quiz" && quizArea){
-    player.x = clamp(player.x, quizArea.x0, quizArea.x1);
-    player.vx = 0; // no drift in quiz
+  // ground collision
+  const floor = groundY - player.h;
+  if(player.y >= floor){
+    player.y = floor;
+    player.vy = 0;
+    player.onGround = true;
   }
 
-  resolvePlatforms();
+  // camera follows world, keeping player area stable
+  // The cameraX is simply worldX (so blocks scroll towards player)
+  state.cameraX = state.worldX;
 
-  // coin pickup (visible)
-  for(const c of world.coins){
-    if(c.taken) continue;
-    const dx=(player.x+player.w/2)-c.x;
-    const dy=(player.y+player.h/2)-c.y;
-    if(dx*dx + dy*dy < (c.r+18)*(c.r+18)){
-      c.taken=true;
-      state.coins += 1;
-      state.score += 1;
-      updateHUD();
-      addFloatPop(c.x, c.y-10, "+1", "rgba(255,219,120,.95)", 650);
-      addBurst(c.x, c.y, "rgba(255,219,120,.95)");
+  // if blocks exist and player passes beyond last block without hitting -> NA
+  if(state.phase === "question" && state.blocks.length){
+    const last = state.blocks[state.blocks.length-1];
+    const playerWorldX = state.worldX + player.x;
+    if(!state.answered && playerWorldX > last.x + last.w + 60){
+      autoNoAnswer();
     }
   }
 
-  // brick hit check
-  checkBrickHit();
-
-  // camera
-  const rect = canvas.getBoundingClientRect();
-  const W = rect.width;
-
-  let target;
-  if(state.phase === "quiz" && quizArea){
-    const mid = (quizArea.x0 + quizArea.x1) / 2;
-    target = mid - W/2;
-  } else {
-    target = Math.max(0, player.x - 220);
-  }
-  state.cameraX += (target - state.cameraX) * CAMERA_LERP;
-  state.cameraX = Math.max(0, state.cameraX);
-
-  // fall recovery
-  if(player.y > SAFE_FALL_Y){
-    player.x = state.lastSafeX;
-    player.y = state.lastSafeY;
-    player.vx = 0; player.vy = 0;
-  }
-
-  // checkpoint trigger
-  if(state.phase==="play"){
-    for(const cp of world.checkpoints){
-      if(cp.used) continue;
-      if(player.x > cp.x){
-        cp.used = true;
-        // start quiz only if grounded; if not grounded, allow re-trigger
-        if(!startQuiz()){
-          cp.used = false;
-        }
-        break;
-      }
-    }
-  }
-
-  // finish
-  if(player.x > LEVEL_END_X + 40){
-    endGame();
-  }
-}
-
-function tick(now){
-  physicsStep(now);
-  draw(now);
-  requestAnimationFrame(tick);
+  // collision with blocks
+  checkBlockCollisions(now);
 }
 
 /* =========================================================
-   START / END / RESET
+   Game start / end
    ========================================================= */
+function prepareQuestions(){
+  state.questions = shuffle(QUESTION_BANK).slice(0, Math.min(QUESTIONS_PER_RUN, QUESTION_BANK.length));
+  state.qIndex = 0;
+  qtotalEl.textContent = String(state.questions.length);
+}
+
 function boot(){
-  state.running=false;
-  state.phase="menu";
-  state.score=0;
-  state.coins=0;
-  state.correct=0;
-  state.attempted=0;
-  state.qIndex=0;
-  state.current=null;
-  state.log=[];
-  state.popUntil=0;
-  state.cameraX=0;
-  state.floatPop=[];
-  state.particles=[];
+  state.running = false;
+  state.phase = "menu";
 
-  world = makeLevel();
+  state.score = 0;
+  state.coins = 0;
+  state.correct = 0;
+  state.attempted = 0;
 
-  player.x=80; player.y=280; player.vx=0; player.vy=0; player.onGround=false;
-  player.t=0; player.faceDir=1;
+  state.qIndex = 0;
+  state.current = null;
 
-  quizBricks=[]; quizArea=null;
-  cleanupQuizSupport();
+  state.cameraX = 0;
+  state.worldX = 0;
+
+  state.blocks = [];
+  state.answered = false;
+
+  state.floatPop = [];
+  state.particles = [];
+  state.log = [];
+
+  popupEl.style.display = "none";
+  topicBadge.textContent = "Ready";
+  qTextEl.textContent = "Press Start to begin.";
+  choicesEl.innerHTML = "";
 
   prepareQuestions();
   updateHUD();
-
-  topicBadge.textContent="Ready";
-  qTextEl.textContent="Press Start to begin.";
-  choicesEl.innerHTML="";
-  popupEl.style.display="none";
-
-  document.getElementById("startBtn").disabled=false;
-  document.getElementById("startBtn").textContent="Start";
+  resetPlayer();
 }
 
 function startGame(){
-  state.running=true;
-  state.phase="play";
-  topicBadge.textContent="Running";
-  qTextEl.textContent="Run forward. Quiz pauses at checkpoints.";
-  choicesEl.innerHTML="";
-  document.getElementById("startBtn").disabled=true;
-  document.getElementById("startBtn").textContent="Running…";
+  overlay.style.display = "none";
+  state.running = true;
+  state.phase = "run";
+  topicBadge.textContent = "Running";
+  qTextEl.textContent = "Get ready. First question starts now.";
+  choicesEl.innerHTML = "";
+
+  // start first question after short warm-up
+  setTimeout(()=> startQuestion(), 650);
 }
 
 function endGame(){
-  state.running=false;
-  state.phase="end";
-  document.getElementById("startBtn").disabled=false;
-  document.getElementById("startBtn").textContent="Start";
+  state.running = false;
+  state.phase = "end";
 
   const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
-
-  document.getElementById("modalTitle").textContent="Level Completed";
-  document.getElementById("modalBody").innerHTML = `
-    <p><b>Score:</b> ${state.score} &nbsp; | &nbsp; <b>Coins:</b> ${state.coins} &nbsp; | &nbsp; <b>Accuracy:</b> ${acc}% &nbsp; | &nbsp; <b>Attempted:</b> ${state.attempted}</p>
+  modalTitle.textContent = "Run Completed";
+  modalBody.innerHTML = `
+    <p><b>Score:</b> ${state.score} &nbsp; | &nbsp; <b>Accuracy:</b> ${acc}% &nbsp; | &nbsp; <b>Attempted:</b> ${state.attempted}</p>
     <p class="muted">Download CSV for analysis.</p>
     <div class="row" style="justify-content:flex-start; margin-top:10px; gap:10px;">
       <button class="btn" id="dlBtn">Download CSV</button>
-      <button class="btn" id="reviewBtn">Review</button>
     </div>
-    <div id="reviewArea" style="display:none; margin-top:12px;"></div>
   `;
-  overlay.style.display="flex";
-
-  setTimeout(()=>{
-    document.getElementById("dlBtn").onclick = downloadCSV;
-    document.getElementById("reviewBtn").onclick = ()=>{
-      const ra = document.getElementById("reviewArea");
-      ra.style.display = (ra.style.display==="none") ? "block" : "none";
-      if(ra.innerHTML.trim()==="") ra.innerHTML = renderReviewHTML();
-    };
-  },0);
-}
-
-function renderReviewHTML(){
-  const byId = new Map(state.questions.map(q => [q.id, q]));
-  const items = state.log.map(r=>{
-    const q = byId.get(r.qid);
-    if(!q) return "";
-    return `
-      <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:16px; margin:8px 0; background:rgba(0,0,0,.10);">
-        <div style="font-weight:950">${escapeHtml(q.q)}</div>
-        <div class="muted" style="margin-top:6px; font-size:13px">
-          A: ${escapeHtml(q.A)}<br/>
-          B: ${escapeHtml(q.B)}<br/>
-          C: ${escapeHtml(q.C)}<br/>
-          <b>Correct:</b> ${q.correct} &nbsp; | &nbsp; <b>Your answer:</b> ${r.selected} &nbsp; | &nbsp;
-          <b>${r.is_correct ? "Correct" : "Wrong"}</b>
-          <br/><span class="muted">${escapeHtml(q.why)}</span>
-        </div>
-      </div>
-    `;
-  }).join("");
-  return `<div style="max-height:280px; overflow:auto; padding-right:6px;">${items}</div>`;
+  overlay.style.display = "flex";
+  setTimeout(()=> document.getElementById("dlBtn").onclick = downloadCSV, 0);
 }
 
 function downloadCSV(){
-  const rows = [["ts","qid","topic","selected","correct","is_correct","response_ms","score_after","coins"]];
+  const rows = [["ts","qid","topic","selected","correct","is_correct","response_ms","score_after"]];
   for(const r of state.log){
-    rows.push([r.ts,r.qid,r.topic,r.selected,r.correct,r.is_correct,r.response_ms,r.score_after,r.coins]);
+    rows.push([r.ts,r.qid,r.topic,r.selected,r.correct,r.is_correct,r.response_ms,r.score_after]);
   }
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href=url; a.download="GBL_Platformer_v4_Log.csv";
+  a.href=url; a.download="GBL_Runner_v5_Log.csv";
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 }
 
 /* =========================================================
-   INIT
+   Buttons
    ========================================================= */
-document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
-document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
 document.getElementById("restartBtn").onclick = ()=> { overlay.style.display="none"; boot(); };
-document.getElementById("startBtn").onclick = ()=> { overlay.style.display="none"; if(!state.running) startGame(); };
+document.getElementById("startBtn").onclick = ()=> { if(!state.running) startGame(); };
 
+/* =========================================================
+   Loop
+   ========================================================= */
+function loop(now){
+  step(now);
+  draw(now);
+  requestAnimationFrame(loop);
+}
+
+/* =========================================================
+   Init
+   ========================================================= */
 fitCanvas();
-initParallax();
+initSky();
 boot();
-requestAnimationFrame(tick);
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
+```
