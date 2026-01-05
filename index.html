@@ -1,54 +1,38 @@
-Absolutely. If the **logic is fine**, the right move is to **upgrade only the visuals** (cabinet look, neon lanes, better ball sprite feel, richer glow, nicer launcher, better effects) without touching the fairness/commit logic.
-
-Below is a **full drop-in replacement** of the **Cyber Pinball Quiz** code you already have, with a significantly improved look:
-
-* Neon “arcade cabinet” frame + side rails
-* Lanes look like real gates (chevrons + glass panels)
-* Ball looks like a glowing “data packet” with a **hex pattern** + bloom
-* Better trail + impact sparks
-* Launcher looks like a real plunger (spring + energy meter)
-* Bumpers are more alive (pulsing rings + hit flash)
-* Small “muzzle flash” style burst when launched
-* Still **controlled + fair** (same logic: chosen lane always reachable)
-
-Replace your whole HTML with this:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Cyber Pinball Quiz — GBL (Upgraded Visuals, Same Logic)</title>
+  <title>Cyber Pinball Quiz — Board + Ball (Improved Graphics)</title>
   <style>
     :root{
-      --bg:#050b18;
+      --bg0:#040813;
+      --bg1:#061029;
       --ink:#eaf0ff;
       --muted:#b9c6ff;
 
       --panel:rgba(255,255,255,.08);
       --border:rgba(255,255,255,.14);
-      --shadow:0 12px 34px rgba(0,0,0,.35);
+      --shadow:0 14px 38px rgba(0,0,0,.40);
 
       --good:#39d98a;
       --bad:#ff5c7a;
+      --gold:#ffd84d;
 
       --a:#7c5cff;
       --b:#33d6ff;
       --c:#ff7ad9;
-
-      --gold:#ffd84d;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:
-        radial-gradient(1200px 680px at 70% 5%, rgba(51,214,255,.18), transparent 60%),
-        radial-gradient(1100px 650px at 20% 10%, rgba(124,92,255,.16), transparent 60%),
-        radial-gradient(900px 600px at 50% 95%, rgba(255,216,77,.10), transparent 60%),
-        linear-gradient(180deg, #040812, var(--bg));
+        radial-gradient(1100px 520px at 75% 8%, rgba(51,214,255,.16), transparent 60%),
+        radial-gradient(900px 520px at 18% 18%, rgba(124,92,255,.14), transparent 60%),
+        radial-gradient(900px 520px at 48% 92%, rgba(255,216,77,.10), transparent 65%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow:hidden;
     }
     .wrap{height:100dvh; display:flex; flex-direction:column;}
@@ -56,7 +40,7 @@ Replace your whole HTML with this:
       padding:12px 14px 10px;
       display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;
     }
-    .brand{display:flex; flex-direction:column; gap:2px; min-width:260px;}
+    .brand{display:flex; flex-direction:column; gap:2px; min-width:280px;}
     .brand .t{font-weight:950;}
     .brand .s{font-size:12px; color:var(--muted)}
     .hud{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
@@ -86,8 +70,7 @@ Replace your whole HTML with this:
     }
     .btn:active{transform:translateY(1px)}
 
-    main{flex:1; padding:0 12px 12px; display:flex; flex-direction:column; gap:10px;}
-    .row{display:flex; gap:10px; align-items:stretch;}
+    main{flex:1; padding:0 12px 12px; display:flex; gap:10px; align-items:stretch;}
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
       border:1px solid var(--border);
@@ -95,9 +78,13 @@ Replace your whole HTML with this:
       box-shadow:var(--shadow);
       padding:12px;
       backdrop-filter: blur(10px);
+      position:relative;
+      overflow:hidden;
     }
-    .qCard{flex:1.15; min-height:170px; position:relative; overflow:hidden;}
-    .qTitle{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;}
+    .left{flex:1.15; min-width:320px;}
+    .right{flex:1.85; min-width:360px; display:flex; flex-direction:column; gap:10px;}
+
+    .qTitle{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;}
     .badge{
       font-size:12px;
       padding:6px 10px;
@@ -107,11 +94,11 @@ Replace your whole HTML with this:
       white-space:nowrap;
       user-select:none;
     }
-    .qText{font-size:16px; line-height:1.28; font-weight:950; margin-top:6px;}
-    .choices{margin-top:10px; display:grid; gap:6px;}
+    .qText{font-size:16px; line-height:1.28; font-weight:950; margin-top:4px;}
+    .choices{margin-top:10px; display:grid; gap:8px;}
     .choice{
-      display:flex; gap:10px; align-items:center;
-      padding:9px 10px;
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.10);
@@ -123,13 +110,14 @@ Replace your whole HTML with this:
       display:grid; place-items:center;
       font-weight:950; color:#0b1220;
       flex:0 0 auto;
+      margin-top:1px;
     }
     .tag.A{background:var(--a)}
     .tag.B{background:var(--b)}
     .tag.C{background:var(--c)}
     .muted{color:var(--muted)}
 
-    .readBarWrap{
+    .readWrap{
       margin-top:10px;
       padding:10px;
       border-radius:14px;
@@ -165,16 +153,16 @@ Replace your whole HTML with this:
       display:none;
     }
 
-    .gameCard{flex:1.85; display:flex; flex-direction:column; gap:10px; padding:10px;}
     canvas{
       width:100%;
-      height:min(56dvh, 580px);
+      height:min(60dvh, 620px);
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.10));
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.16));
       box-shadow:var(--shadow);
       touch-action:none;
     }
+
     .controls{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -192,30 +180,31 @@ Replace your whole HTML with this:
       align-items:center;
       font-weight:950;
       text-align:center;
-      min-height:56px;
+      min-height:58px;
+      cursor:pointer;
+      transition: transform .05s ease;
     }
-    .ctl small{font-weight:700; color:var(--muted); line-height:1.2;}
-    .footerRow{
-      display:flex; gap:10px; flex-wrap:wrap;
-      justify-content:space-between; align-items:center;
-      padding:2px 2px 0;
-    }
+    .ctl:active{transform:translateY(1px)}
+    .ctl small{font-weight:750; color:var(--muted); line-height:1.2;}
+
+    .footerRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;}
     .tiny{font-size:12px; color:var(--muted)}
 
     .pop{
       position:absolute;
-      left:50%; top:56%;
+      left:50%;
+      top:62%;
       transform:translate(-50%,-50%);
       padding:12px 14px;
       border-radius:18px;
       font-weight:950;
       display:none;
-      z-index:5;
+      z-index:10;
       border:1px solid rgba(255,255,255,.14);
       box-shadow:var(--shadow);
       backdrop-filter: blur(8px);
       text-align:center;
-      min-width:320px;
+      min-width:min(560px, 92%);
       user-select:none;
     }
     .pop.good{background:rgba(57,217,138,.20)}
@@ -244,9 +233,9 @@ Replace your whole HTML with this:
     .modal .row{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px;}
 
     @media (max-width: 900px){
-      .row{flex-direction:column}
-      canvas{height:min(52dvh, 500px);}
-      .qText{font-size:15px}
+      main{flex-direction:column}
+      .left,.right{min-width:unset}
+      canvas{height:min(54dvh, 560px)}
     }
   </style>
 </head>
@@ -254,8 +243,8 @@ Replace your whole HTML with this:
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="t">Cyber Pinball Quiz — GBL</div>
-      <div class="s">Upgraded visuals. Same fair logic: your intended lane is always reachable.</div>
+      <div class="t">Cyber Pinball Quiz — Board + Ball</div>
+      <div class="s">Same stable logic. Better cabinet graphics, lanes, ball glow, and effects.</div>
     </div>
     <div class="hud">
       <div class="pill">Score: <b id="score">0</b></div>
@@ -267,43 +256,40 @@ Replace your whole HTML with this:
   </header>
 
   <main>
-    <div class="row">
-      <section class="card qCard" aria-live="polite">
-        <div class="qTitle">
-          <div class="badge" id="topicBadge">Ready</div>
-          <div class="tiny muted">Hold to charge, drag to aim, release to launch.</div>
+    <section class="card left" aria-live="polite">
+      <div class="qTitle">
+        <div class="badge" id="topicBadge">Ready</div>
+        <div class="muted" style="font-size:12px">Aim: ←/→ or tap canvas. Charge: hold Space / Hold button.</div>
+      </div>
+      <div class="qText" id="qText">Press Start to begin.</div>
+      <div class="choices" id="choices"></div>
+
+      <div class="readWrap" id="readWrap">
+        <div class="readLabel">
+          <span>Reading time…</span>
+          <span id="readSecs">0.0s</span>
         </div>
+        <div class="bar"><div id="readBar"></div></div>
+      </div>
 
-        <div class="qText" id="qText">Press Start to begin.</div>
-        <div class="choices" id="choices"></div>
+      <div class="statusLine" id="statusLine"></div>
+      <div class="pop" id="popup"></div>
+    </section>
 
-        <div class="readBarWrap" id="readWrap">
-          <div class="readLabel">
-            <span>Reading time…</span>
-            <span id="readSecs">0.0s</span>
-          </div>
-          <div class="bar"><div id="readBar"></div></div>
-        </div>
+    <section class="card right">
+      <canvas id="c"></canvas>
 
-        <div class="statusLine" id="statusLine"></div>
-        <div class="pop" id="popup"></div>
-      </section>
+      <div class="controls">
+        <div class="ctl" id="leftBtn">Aim ◀ <small>←</small></div>
+        <div class="ctl" id="launchBtn">Hold & Release <small>Space</small></div>
+        <div class="ctl" id="rightBtn">Aim ▶ <small>→</small></div>
+      </div>
 
-      <section class="card gameCard">
-        <canvas id="c"></canvas>
-
-        <div class="controls">
-          <div class="ctl" id="leftBtn" role="button" tabindex="0">Aim ◀ <small>←</small></div>
-          <div class="ctl" id="launchBtn" role="button" tabindex="0">Hold & Release <small>Space</small></div>
-          <div class="ctl" id="rightBtn" role="button" tabindex="0">Aim ▶ <small>→</small></div>
-        </div>
-
-        <div class="footerRow">
-          <div class="tiny">Tip: Tap canvas to aim. Hold in launcher area to charge. Release to launch.</div>
-          <button class="btn" id="startBtn">Start</button>
-        </div>
-      </section>
-    </div>
+      <div class="footerRow">
+        <div class="tiny">Gameplay: After reading time, aim and launch the data-packet ball into lane A/B/C.</div>
+        <button class="btn" id="startBtn">Start</button>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -312,13 +298,13 @@ Replace your whole HTML with this:
     <h2 id="modalTitle">How to Play</h2>
     <div id="modalBody">
       <ul>
-        <li>A question appears and the game pauses for a few seconds so you can read.</li>
-        <li>Then aim and launch the glowing “data packet” ball toward lane <b>A</b>, <b>B</b>, or <b>C</b>.</li>
-        <li><b>Mobile / Mouse:</b> press & hold to charge, drag slightly to aim, release to launch.</li>
-        <li><b>Keyboard:</b> ← / → to aim, hold Space to charge, release Space to launch.</li>
+        <li>First, the game pauses so you can read the question properly.</li>
+        <li>Then aim and launch the glowing ball into lane <b>A</b>, <b>B</b>, or <b>C</b>.</li>
+        <li><b>Keyboard:</b> ← / → to aim. Hold Space to charge. Release Space to launch.</li>
+        <li><b>Mobile:</b> tap/drag on the board to aim. Hold the “Hold & Release” button to charge, then release.</li>
         <li>Correct lane: <b>+10</b>. Wrong lane: <b>0</b>. One launch per question.</li>
       </ul>
-      <p class="muted">This is a controlled pinball: it never “cheats” your intended lane.</p>
+      <p class="muted">This is a controlled pinball: it will not create unreachable options.</p>
     </div>
     <div class="row">
       <button class="btn" id="closeModal">Close</button>
@@ -327,75 +313,58 @@ Replace your whole HTML with this:
 </div>
 
 <script>
-/* =========================================================
+/* ===========================
    PID optional: ?pid=UOU123
-   ========================================================= */
+   =========================== */
 const params = new URLSearchParams(location.search);
 const PID = params.get("pid") || "UOU-ANON";
 
-/* =========================================================
-   Question bank (keep / replace with your chapter MCQs)
-   ========================================================= */
+/* ===========================
+   Question bank (replace later with chapter MCQs)
+   Correct is stored as correctText, not fixed A/B/C.
+   =========================== */
 const QUESTION_BANK = [
   { id:"Q1", topic:"Smartphone Security",
     q:"Which practice best reduces risk from malicious apps?",
     options:["Install only from official stores","Disable screen lock","Keep Bluetooth always ON"],
     correctText:"Install only from official stores",
-    why:"Official stores reduce exposure to unknown, repackaged or malicious apps."
+    why:"Official stores reduce exposure to unknown, repackaged, or malicious apps."
   },
   { id:"Q2", topic:"Android Security",
-    q:"Device encryption on Android primarily protects data:",
-    options:["When the device is lost or powered off","Only when Wi-Fi is on","Only inside a browser"],
+    q:"Device encryption mainly protects data:",
+    options:["When the device is lost or powered off","Only when Wi-Fi is on","Only inside browser"],
     correctText:"When the device is lost or powered off",
-    why:"Encryption protects stored data, especially if the device is stolen or offline."
+    why:"Encryption protects stored data if the device is stolen or offline."
   },
   { id:"Q3", topic:"iOS Security",
-    q:"On iPhone, enabling a strong passcode improves:",
+    q:"A strong iPhone passcode improves:",
     options:["Data protection for stored content","Camera quality","Battery capacity"],
     correctText:"Data protection for stored content",
-    why:"A strong passcode strengthens iOS data protection mechanisms."
+    why:"Passcode strengthens iOS data protection mechanisms."
   },
   { id:"Q4", topic:"Smartphone Security",
-    q:"Using public Wi-Fi is risky mainly due to:",
-    options:["Possible interception and rogue access points","Lower screen brightness","Extra storage usage"],
-    correctText:"Possible interception and rogue access points",
-    why:"Public networks can be monitored or spoofed to capture traffic and credentials."
+    q:"Public Wi-Fi is risky mainly due to:",
+    options:["Interception and rogue access points","Lower brightness","Extra storage usage"],
+    correctText:"Interception and rogue access points",
+    why:"Public networks can be monitored or spoofed."
   },
   { id:"Q5", topic:"Android Security",
-    q:"Granting unnecessary app permissions can lead to:",
+    q:"Unnecessary app permissions can lead to:",
     options:["Data leakage and privacy loss","Faster charging","Better speaker sound"],
     correctText:"Data leakage and privacy loss",
     why:"Excess permissions may expose contacts, location, files, or messages."
   },
   { id:"Q6", topic:"iOS Security",
-    q:"A key benefit of “Find My iPhone” is:",
-    options:["Locate and remotely erase a lost phone","Increase download speed","Automatically jailbreak the phone"],
+    q:"A key benefit of Find My iPhone is:",
+    options:["Locate and remotely erase a lost phone","Increase download speed","Automatically jailbreak phone"],
     correctText:"Locate and remotely erase a lost phone",
-    why:"Find My supports location tracking and remote wipe to protect data."
-  },
-  { id:"Q7", topic:"Smartphone Security",
-    q:"Best immediate action when you suspect a phishing link was clicked?",
-    options:["Change passwords and enable 2FA","Turn up volume","Ignore and keep using normally"],
-    correctText:"Change passwords and enable 2FA",
-    why:"Resetting credentials + 2FA reduces account takeover risk."
-  },
-  { id:"Q8", topic:"Android Security",
-    q:"Rooting a phone generally:",
-    options:["Increases attack surface by bypassing protections","Always improves security","Only changes wallpaper features"],
-    correctText:"Increases attack surface by bypassing protections",
-    why:"Rooting weakens system security controls and sandboxing."
-  },
-  { id:"Q9", topic:"iOS Security",
-    q:"Jailbreaking an iPhone typically:",
-    options:["Reduces built-in security restrictions","Is required for encryption","Prevents all malware"],
-    correctText:"Reduces built-in security restrictions",
-    why:"Jailbreak removes Apple restrictions and can weaken the security model."
+    why:"It supports location tracking and remote wipe."
   },
 ];
 
-/* =========================================================
+/* ===========================
    Helpers
-   ========================================================= */
+   =========================== */
 function shuffle(arr){
   const a = arr.slice();
   for(let i=a.length-1;i>0;i--){
@@ -410,195 +379,16 @@ function escapeHtml(s){
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[m]));
 }
-
-/* =========================================================
-   UI refs
-   ========================================================= */
-const scoreEl = document.getElementById("score");
-const accEl   = document.getElementById("acc");
-const qnumEl  = document.getElementById("qnum");
-const qtotalEl= document.getElementById("qtotal");
-const topicBadge = document.getElementById("topicBadge");
-const qTextEl = document.getElementById("qText");
-const choicesEl = document.getElementById("choices");
-const popupEl = document.getElementById("popup");
-const readWrap = document.getElementById("readWrap");
-const readBar  = document.getElementById("readBar");
-const readSecs = document.getElementById("readSecs");
-const statusLine = document.getElementById("statusLine");
-
-const overlay = document.getElementById("overlay");
-document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
-document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
-
-/* =========================================================
-   Game tuning (logic unchanged)
-   ========================================================= */
-const READ_PAUSE_MS = 4500;
-const AIM_TIME_LIMIT_MS = 16000;
-const FEEDBACK_MS = 950;
-const QUESTIONS_PER_RUN = 9;
-
-const DT = 1/60;
-const BALL_R = 10;
-const MAX_POWER = 18;
-const STEER_STRENGTH = 0.085;
-const DRAG = 0.992;
-const BOUNCE = 0.82;
-const BUMPER_BOUNCE = 1.05;
-
-/* =========================================================
-   Canvas + board geometry
-   ========================================================= */
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-
-function fitCanvas(){
-  const rect = canvas.getBoundingClientRect();
-  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  canvas.width = Math.floor(rect.width * dpr);
-  canvas.height = Math.floor(rect.height * dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
 function cssVar(name){
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-let stars=[];
-let dust=[];
-function initBackdrop(){
-  const r = canvas.getBoundingClientRect();
-  stars=[];
-  dust=[];
-  for(let i=0;i<70;i++){
-    stars.push({x:Math.random()*r.width, y:Math.random()*r.height*0.85, r:0.8+Math.random()*1.8, t:Math.random()*6.28});
-  }
-  for(let i=0;i<85;i++){
-    dust.push({x:Math.random()*r.width, y:Math.random()*r.height, a:0.10+Math.random()*0.18, s:0.25+Math.random()*0.65});
-  }
-}
-
-/* Board parts */
-const board = {
-  W:0,H:0,
-  pad:0,
-  laneY:0, laneH:0,
-  lanes:[],
-  launcher:{x:0,y:0,w:0,h:0},
-  bumpers:[],
-  walls:{left:0,right:0,top:0,bottom:0},
-  rail:{}
-};
-
-function buildBoard(){
-  const r = canvas.getBoundingClientRect();
-  board.W = r.width;
-  board.H = r.height;
-  board.pad = Math.round(Math.min(board.W, board.H) * 0.062);
-
-  board.walls = {
-    left: board.pad,
-    right: board.W - board.pad,
-    top: board.pad,
-    bottom: board.H - board.pad
-  };
-
-  board.laneH = Math.round(board.H * 0.14);
-  board.laneY = board.walls.top + Math.round(board.H * 0.02);
-  const laneAreaW = board.walls.right - board.walls.left;
-  const laneW = laneAreaW / 3;
-
-  board.lanes = [
-    {key:"A", x:board.walls.left + laneW*0, w:laneW},
-    {key:"B", x:board.walls.left + laneW*1, w:laneW},
-    {key:"C", x:board.walls.left + laneW*2, w:laneW},
-  ];
-
-  const lw = Math.round(laneAreaW * 0.28);
-  const lh = Math.round(board.H * 0.18);
-  board.launcher = {
-    x: board.W/2 - lw/2,
-    y: board.walls.bottom - lh - Math.round(board.H*0.02),
-    w: lw,
-    h: lh
-  };
-
-  const midY = board.laneY + board.laneH + (board.H*0.20);
-  board.bumpers = [
-    {x: board.W*0.30, y: midY, r: 18, flash:0},
-    {x: board.W*0.50, y: midY + 56, r: 20, flash:0},
-    {x: board.W*0.70, y: midY, r: 18, flash:0},
-  ];
-
-  // side rails for cabinet look
-  const railW = Math.max(16, Math.round(board.W*0.04));
-  board.rail = {w:railW};
-}
-
-function roundRect(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
-
-/* =========================================================
-   State
-   ========================================================= */
-const state = {
-  running:false,
-  phase:"menu", // menu | read | aim | flight | feedback | end
-  score:0, correct:0, attempted:0,
-  questions:[], qIndex:0, current:null,
-
-  readStart:0, readUntil:0,
-  aimStart:0, aimUntil:0,
-  decisionStart:0,
-
-  aimX:0,
-  power:0,
-  charging:false,
-  chosenLane:null,
-
-  ball:{x:0,y:0,vx:0,vy:0,active:false,trail:[]},
-
-  particles:[],
-  floatPop:[],
-  log:[],
-
-  // subtle shake
-  shake:0,
-  shakeX:0,
-  shakeY:0,
-};
-
-function updateHUD(){
-  scoreEl.textContent = String(state.score);
-  const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
-  accEl.textContent = acc + "%";
-  qnumEl.textContent = String(state.attempted);
-  qtotalEl.textContent = String(state.questions.length);
-}
-function setStatus(text, show=true){
-  statusLine.textContent = text;
-  statusLine.style.display = show ? "block" : "none";
-}
-function showPopup(ok, correctKey, why){
-  popupEl.className = "pop " + (ok ? "good" : "bad");
-  popupEl.style.display = "block";
-  popupEl.innerHTML = (ok ? "✅ Correct! (+10)" : "❌ Wrong!") +
-    `<span class="why">Correct: ${correctKey}. ${escapeHtml(why)}</span>`;
-  setTimeout(()=> popupEl.style.display="none", FEEDBACK_MS);
-}
-
-/* =========================================================
-   Question prep: shuffle options + balance correct letters
-   ========================================================= */
+/* ===========================
+   Balanced option placement:
+   prevents “A is often correct”
+   =========================== */
 function prepareQuestionsBalanced(){
-  const selected = shuffle(QUESTION_BANK).slice(0, Math.min(QUESTIONS_PER_RUN, QUESTION_BANK.length));
+  const selected = shuffle(QUESTION_BANK).slice(0, Math.min(10, QUESTION_BANK.length));
   const n = selected.length;
 
   const base = Math.floor(n/3);
@@ -636,6 +426,190 @@ function prepareQuestionsBalanced(){
   });
 }
 
+/* ===========================
+   UI refs
+   =========================== */
+const scoreEl = document.getElementById("score");
+const accEl   = document.getElementById("acc");
+const qnumEl  = document.getElementById("qnum");
+const qtotalEl= document.getElementById("qtotal");
+const topicBadge = document.getElementById("topicBadge");
+const qTextEl = document.getElementById("qText");
+const choicesEl = document.getElementById("choices");
+const readWrap = document.getElementById("readWrap");
+const readBar  = document.getElementById("readBar");
+const readSecs = document.getElementById("readSecs");
+const statusLine = document.getElementById("statusLine");
+const popupEl = document.getElementById("popup");
+
+const overlay = document.getElementById("overlay");
+document.getElementById("howBtn").onclick = ()=> overlay.style.display="flex";
+document.getElementById("closeModal").onclick = ()=> overlay.style.display="none";
+
+function setStatus(text, show=true){
+  statusLine.textContent = text;
+  statusLine.style.display = show ? "block" : "none";
+}
+function showPopup(ok, correctKey, why){
+  popupEl.className = "pop " + (ok ? "good" : "bad");
+  popupEl.style.display = "block";
+  popupEl.innerHTML = (ok ? "✅ Correct! (+10)" : "❌ Wrong!") +
+    `<span class="why">Correct: ${correctKey}. ${escapeHtml(why)}</span>`;
+  setTimeout(()=> popupEl.style.display="none", FEEDBACK_MS);
+}
+
+/* ===========================
+   Game tuning
+   =========================== */
+const READ_PAUSE_MS = 4500;
+const AIM_TIME_LIMIT_MS = 16000;
+const FEEDBACK_MS = 950;
+
+// motion values
+const BALL_R = 10;
+const MAX_POWER = 18;
+const DRAG = 0.992;
+const BOUNCE = 0.84;
+const STEER_STRENGTH = 0.085;
+const BUMPER_BOUNCE = 1.06;
+
+/* ===========================
+   Canvas
+   =========================== */
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+function fitCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  canvas.width = Math.floor(rect.width * dpr);
+  canvas.height = Math.floor(rect.height * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ===========================
+   Backdrop particles
+   =========================== */
+let stars=[], dust=[];
+function initBackdrop(){
+  const r = canvas.getBoundingClientRect();
+  stars=[]; dust=[];
+  for(let i=0;i<70;i++){
+    stars.push({x:Math.random()*r.width, y:Math.random()*r.height*0.88, r:0.8+Math.random()*1.8, t:Math.random()*6.28});
+  }
+  for(let i=0;i<85;i++){
+    dust.push({x:Math.random()*r.width, y:Math.random()*r.height, a:0.10+Math.random()*0.18, s:0.25+Math.random()*0.65});
+  }
+}
+
+/* ===========================
+   Board geometry
+   =========================== */
+const board = {
+  W:0,H:0,pad:0,
+  laneY:0,laneH:0,lanes:[],
+  launcher:{x:0,y:0,w:0,h:0},
+  bumpers:[],
+  walls:{left:0,right:0,top:0,bottom:0},
+  rail:{w:0}
+};
+
+function buildBoard(){
+  const r = canvas.getBoundingClientRect();
+  board.W = r.width;
+  board.H = r.height;
+  board.pad = Math.round(Math.min(board.W, board.H) * 0.062);
+
+  board.walls = {
+    left: board.pad,
+    right: board.W - board.pad,
+    top: board.pad,
+    bottom: board.H - board.pad
+  };
+
+  board.laneH = Math.round(board.H * 0.14);
+  board.laneY = board.walls.top + Math.round(board.H * 0.02);
+  const laneAreaW = board.walls.right - board.walls.left;
+  const laneW = laneAreaW / 3;
+
+  board.lanes = [
+    {key:"A", x:board.walls.left + laneW*0, w:laneW},
+    {key:"B", x:board.walls.left + laneW*1, w:laneW},
+    {key:"C", x:board.walls.left + laneW*2, w:laneW},
+  ];
+
+  const lw = Math.round(laneAreaW * 0.28);
+  const lh = Math.round(board.H * 0.18);
+  board.launcher = {
+    x: board.W/2 - lw/2,
+    y: board.walls.bottom - lh - Math.round(board.H*0.02),
+    w: lw, h: lh
+  };
+
+  const midY = board.laneY + board.laneH + (board.H*0.20);
+  board.bumpers = [
+    {x: board.W*0.30, y: midY, r: 18, flash:0},
+    {x: board.W*0.50, y: midY + 56, r: 20, flash:0},
+    {x: board.W*0.70, y: midY, r: 18, flash:0},
+  ];
+
+  board.rail.w = Math.max(16, Math.round(board.W*0.04));
+}
+
+function laneCenterX(key){
+  const lane = board.lanes.find(l=>l.key===key);
+  return lane.x + lane.w/2;
+}
+
+/* ===========================
+   State
+   =========================== */
+const state = {
+  running:false,
+  phase:"menu", // menu | read | aim | flight | feedback | end
+
+  score:0, correct:0, attempted:0,
+  questions:[], qIndex:0, current:null,
+
+  readStart:0, readUntil:0,
+  aimStart:0, aimUntil:0,
+  decisionStart:0,
+
+  aimX:0,
+  power:0,
+  charging:false,
+  chosenLane:null,
+
+  ball:{x:0,y:0,vx:0,vy:0,active:false,trail:[]},
+
+  particles:[],
+  floatPop:[],
+
+  shake:0, shakeX:0, shakeY:0,
+
+  log:[]
+};
+
+function updateHUD(){
+  scoreEl.textContent = String(state.score);
+  const acc = state.attempted ? Math.round((state.correct/state.attempted)*100) : 0;
+  accEl.textContent = acc + "%";
+  qnumEl.textContent = String(state.attempted);
+  qtotalEl.textContent = String(state.questions.length);
+}
+
+/* ===========================
+   Question render
+   =========================== */
 function renderQuestion(q){
   state.current = q;
   topicBadge.textContent = q.topic;
@@ -647,9 +621,9 @@ function renderQuestion(q){
   `;
 }
 
-/* =========================================================
-   Ball / Launch logic (unchanged)
-   ========================================================= */
+/* ===========================
+   Ball / launch (old logic)
+   =========================== */
 function resetBall(){
   const L = board.launcher;
   state.ball.x = L.x + L.w/2;
@@ -668,15 +642,28 @@ function laneFromAim(aimX){
   if(aimX >  0.22) return "C";
   return "B";
 }
-function laneCenterX(key){
-  const lane = board.lanes.find(l=>l.key===key);
-  return lane.x + lane.w/2;
+function burst(x,y,color,count=18){
+  for(let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2;
+    const sp = 1.6 + Math.random()*3.4;
+    state.particles.push({
+      x,y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-1.2,
+      born:performance.now(), life:520+Math.random()*320,
+      color, r:1.4+Math.random()*2.6
+    });
+  }
 }
+function addFloatPop(x, y, text, color, ms=650){
+  state.floatPop.push({x,y,text,color,until:performance.now()+ms});
+}
+function shake(intensity){
+  state.shake = Math.max(state.shake, intensity);
+}
+
 function launchBall(){
   if(state.phase !== "aim") return;
 
   state.chosenLane = laneFromAim(state.aimX);
-
   const speed = 8 + (MAX_POWER-8) * state.power;
   const dx = clamp(state.aimX, -1, 1);
 
@@ -687,13 +674,12 @@ function launchBall(){
   state.phase = "flight";
   setStatus(`Launched toward lane ${state.chosenLane}.`, true);
 
-  // launch spark
   burst(state.ball.x, state.ball.y, "rgba(255,216,77,.95)", 22);
 }
 
-/* =========================================================
+/* ===========================
    Input
-   ========================================================= */
+   =========================== */
 const input = {left:false, right:false, spaceDown:false};
 
 window.addEventListener("keydown",(e)=>{
@@ -738,12 +724,12 @@ function pointerPos(ev){
 canvas.addEventListener("pointerdown",(e)=>{
   canvas.setPointerCapture(e.pointerId);
   if(state.phase !== "aim") return;
-
   const p = pointerPos(e);
+  updateAimFromX(p.x);
+
+  // start charge if press near launcher
   const L = board.launcher;
   const inLauncher = (p.x >= L.x-30 && p.x <= L.x+L.w+30 && p.y >= L.y-20 && p.y <= L.y+L.h+30);
-
-  updateAimFromX(p.x);
   if(inLauncher) startCharging();
 });
 canvas.addEventListener("pointermove",(e)=>{
@@ -771,26 +757,9 @@ function stopChargingAndLaunch(){
   launchBall();
 }
 
-/* =========================================================
-   Logging + scoring
-   ========================================================= */
-function addFloatPop(x, y, text, color, ms=650){
-  state.floatPop.push({x,y,text,color,until:performance.now()+ms});
-}
-function burst(x,y,color,count=18){
-  for(let i=0;i<count;i++){
-    const a = Math.random()*Math.PI*2;
-    const sp = 1.6 + Math.random()*3.4;
-    state.particles.push({
-      x,y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-1.2,
-      born:performance.now(), life:520+Math.random()*320,
-      color, r:1.4+Math.random()*2.6
-    });
-  }
-}
-function shake(intensity){
-  state.shake = Math.max(state.shake, intensity);
-}
+/* ===========================
+   Scoring + logging
+   =========================== */
 function scoreForLane(selectedLane){
   const q = state.current;
   const ok = (selectedLane === q.correct);
@@ -799,16 +768,15 @@ function scoreForLane(selectedLane){
   if(ok){
     state.correct++;
     state.score += 10;
-    addFloatPop(board.W*0.5, board.H*0.52, "+10", "rgba(57,217,138,.95)", 700);
-    burst(board.W*0.5, board.H*0.48, "rgba(57,217,138,.95)", 26);
+    addFloatPop(board.W*0.5, board.H*0.52, "+10", "rgba(57,217,138,.95)", 720);
+    burst(board.W*0.5, board.H*0.48, "rgba(57,217,138,.95)", 28);
   }else{
     addFloatPop(board.W*0.5, board.H*0.52, "0", "rgba(255,255,255,.85)", 650);
-    burst(board.W*0.5, board.H*0.48, "rgba(255,92,122,.95)", 20);
-    shake(4.5);
+    burst(board.W*0.5, board.H*0.48, "rgba(255,92,122,.95)", 22);
+    shake(4.6);
   }
 
   const rt = Math.max(0, Math.round(performance.now() - state.decisionStart));
-
   state.log.push({
     ts: new Date().toISOString(),
     pid: PID,
@@ -829,6 +797,7 @@ function scoreForLane(selectedLane){
   state.phase = "feedback";
   setTimeout(()=> nextQuestion(), FEEDBACK_MS);
 }
+
 function noAnswer(reason){
   if(state.phase === "feedback" || state.phase === "end") return;
 
@@ -852,15 +821,15 @@ function noAnswer(reason){
 
   updateHUD();
   showPopup(false, q.correct, reason || "No answer recorded.");
-  shake(3.0);
+  shake(3.2);
   state.phase = "feedback";
   setTimeout(()=> nextQuestion(), FEEDBACK_MS);
 }
 
-/* =========================================================
-   Physics (same logic)
-   ========================================================= */
-function stepAim(){
+/* ===========================
+   Physics (controlled)
+   =========================== */
+function stepAim(now){
   if(input.left) state.aimX = clamp(state.aimX - 0.03, -1, 1);
   if(input.right) state.aimX = clamp(state.aimX + 0.03, -1, 1);
 
@@ -870,7 +839,7 @@ function stepAim(){
     state.power = clamp(state.power - 0.010, 0, 1);
   }
 
-  if(performance.now() >= state.aimUntil){
+  if(now >= state.aimUntil){
     noAnswer("Time expired (no launch).");
   }
 }
@@ -896,8 +865,8 @@ function collideWalls(){
   }
   if(b.y + BALL_R > W.bottom){
     b.y = W.bottom - BALL_R;
-    b.vy *= -0.3;
-    b.vx *= 0.6;
+    b.vy *= -0.30;
+    b.vx *= 0.60;
     noAnswer("Ball did not enter any lane.");
   }
 }
@@ -912,8 +881,9 @@ function collideBumpers(){
     if(dist < minD){
       const nx = dx / (dist || 1);
       const ny = dy / (dist || 1);
-      b.x = bm.x + nx * (minD + 0.5);
-      b.y = bm.y + ny * (minD + 0.5);
+
+      b.x = bm.x + nx * (minD + 0.6);
+      b.y = bm.y + ny * (minD + 0.6);
 
       const dot = b.vx*nx + b.vy*ny;
       b.vx = (b.vx - 2*dot*nx) * BUMPER_BOUNCE;
@@ -921,7 +891,7 @@ function collideBumpers(){
 
       bm.flash = Math.max(bm.flash, 1.0);
       burst(bm.x, bm.y, "rgba(51,214,255,.85)", 18);
-      shake(2.0);
+      shake(2.2);
     }
   }
 }
@@ -930,6 +900,7 @@ function checkLaneEntry(){
   const b = state.ball;
   const laneY0 = board.laneY;
   const laneY1 = board.laneY + board.laneH;
+
   if(b.y - BALL_R <= laneY1 && b.y + BALL_R >= laneY0){
     for(const lane of board.lanes){
       if(b.x >= lane.x && b.x <= lane.x + lane.w){
@@ -942,6 +913,7 @@ function checkLaneEntry(){
   }
 }
 
+/* Controlled steering so intended lane remains reachable */
 function steerTowardChosenLane(){
   const b = state.ball;
   if(!state.chosenLane) return;
@@ -951,11 +923,12 @@ function steerTowardChosenLane(){
   if(b.vy > -2) b.vy -= 0.06;
 }
 
-function stepFlight(){
+function stepFlight(now){
   const b = state.ball;
   if(!b.active) return;
 
   steerTowardChosenLane();
+
   b.x += b.vx;
   b.y += b.vy;
 
@@ -965,19 +938,18 @@ function stepFlight(){
   collideWalls();
   collideBumpers();
 
-  b.trail.push({x:b.x,y:b.y, t:performance.now()});
+  b.trail.push({x:b.x,y:b.y,t:now});
   if(b.trail.length > 22) b.trail.shift();
 
   checkLaneEntry();
 }
 
-/* =========================================================
-   Rendering upgrades (new visuals)
-   ========================================================= */
+/* ===========================
+   Rendering (improved graphics)
+   =========================== */
 function drawBackdrop(now){
   const r = canvas.getBoundingClientRect();
 
-  // drifting dust
   for(const d of dust){
     d.y += d.s;
     if(d.y > r.height+20){ d.y = -20; d.x = Math.random()*r.width; }
@@ -989,7 +961,6 @@ function drawBackdrop(now){
   }
   ctx.globalAlpha = 1;
 
-  // twinkle stars
   for(const s of stars){
     const tw = 0.45 + 0.55*Math.sin(now/700 + s.t);
     ctx.globalAlpha = 0.10 + tw*0.55;
@@ -1005,36 +976,35 @@ function drawCabinet(){
   const W = board.W, H = board.H;
   const p = board.pad;
 
-  // cabinet outer neon
+  // outer neon
   ctx.save();
-  ctx.globalAlpha = 0.22;
-  ctx.fillStyle = "rgba(124,92,255,.55)";
-  roundRect(p-10, p-10, W-2*(p-10), H-2*(p-10), 22);
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = "rgba(124,92,255,.9)";
+  roundRect(p-12, p-12, W-2*(p-12), H-2*(p-12), 22);
   ctx.fill();
 
-  ctx.globalAlpha = 0.22;
-  ctx.fillStyle = "rgba(51,214,255,.45)";
-  roundRect(p-14, p-14, W-2*(p-14), H-2*(p-14), 24);
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = "rgba(51,214,255,.9)";
+  roundRect(p-16, p-16, W-2*(p-16), H-2*(p-16), 24);
   ctx.fill();
   ctx.restore();
 
-  // inner playfield glass
+  // glass playfield
   const g = ctx.createLinearGradient(0, p, 0, H-p);
-  g.addColorStop(0,"rgba(255,255,255,.08)");
-  g.addColorStop(1,"rgba(0,0,0,.20)");
+  g.addColorStop(0,"rgba(255,255,255,.09)");
+  g.addColorStop(1,"rgba(0,0,0,.22)");
   ctx.fillStyle = g;
   roundRect(p, p, W-2*p, H-2*p, 18);
   ctx.fill();
 
-  // side rails
+  // rails
   const railW = board.rail.w;
   const leftX = p - Math.round(railW*0.35);
   const rightX = W - p - Math.round(railW*0.65);
 
   const rg = ctx.createLinearGradient(0, p, 0, H-p);
-  rg.addColorStop(0,"rgba(255,216,77,.22)");
+  rg.addColorStop(0,"rgba(255,216,77,.20)");
   rg.addColorStop(1,"rgba(255,216,77,.08)");
-
   ctx.fillStyle = rg;
   roundRect(leftX, p+8, railW, H-2*p-16, 16);
   ctx.fill();
@@ -1048,7 +1018,7 @@ function drawCabinet(){
   roundRect(rightX+2, p+10, railW-4, H-2*p-20, 14);
   ctx.stroke();
 
-  // subtle diagonal shine
+  // diagonal shine
   ctx.save();
   ctx.globalAlpha = 0.10;
   ctx.fillStyle = "rgba(255,255,255,.9)";
@@ -1066,7 +1036,7 @@ function drawGrid(){
   const p = board.pad;
   const W = board.W, H = board.H;
   ctx.save();
-  ctx.globalAlpha = 0.10;
+  ctx.globalAlpha = 0.09;
   ctx.strokeStyle = "rgba(255,255,255,.45)";
   ctx.lineWidth = 1;
   for(let x=p+14; x<W-p; x+=30){
@@ -1085,24 +1055,24 @@ function drawLaneGate(lane, now){
   const innerW = lane.w - 20;
 
   const color = lane.key==="A" ? cssVar("--a") : lane.key==="B" ? cssVar("--b") : cssVar("--c");
+  const pulse = 0.35 + 0.30*Math.sin(now/260 + (lane.key.charCodeAt(0)%7));
 
   // glass panel
   ctx.save();
-  const pulse = 0.35 + 0.30*Math.sin(now/260 + (lane.key.charCodeAt(0)%7));
-  ctx.globalAlpha = 0.18 + pulse*0.22;
-  ctx.fillStyle = "rgba(255,255,255,.14)";
+  ctx.globalAlpha = 0.16 + pulse*0.22;
+  ctx.fillStyle = "rgba(255,255,255,.16)";
   roundRect(innerX, y+10, innerW, h-20, 16);
   ctx.fill();
 
   // neon border
-  ctx.globalAlpha = 0.85;
+  ctx.globalAlpha = 0.92;
   ctx.strokeStyle = color;
   ctx.lineWidth = 2.5;
   roundRect(innerX, y+10, innerW, h-20, 16);
   ctx.stroke();
 
   // chevrons
-  ctx.globalAlpha = 0.20 + pulse*0.20;
+  ctx.globalAlpha = 0.18 + pulse*0.22;
   ctx.fillStyle = color;
   const cx = lane.x + lane.w/2;
   const cy = y + h/2 + 6;
@@ -1132,23 +1102,22 @@ function drawLanes(now){
 
 function drawBumpers(now){
   for(const bm of board.bumpers){
-    // flash decay
     bm.flash = Math.max(0, bm.flash - 0.045);
-
     const pulse = 0.35 + 0.25*Math.sin(now/240 + bm.x*0.01);
-    const glowA = 0.14 + pulse*0.18;
 
     // outer glow
     ctx.save();
-    ctx.globalAlpha = glowA + bm.flash*0.25;
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = 0.10 + pulse*0.16 + bm.flash*0.22;
     ctx.fillStyle = "rgba(51,214,255,.9)";
     ctx.beginPath();
-    ctx.arc(bm.x, bm.y, bm.r+14, 0, Math.PI*2);
+    ctx.arc(bm.x, bm.y, bm.r+16, 0, Math.PI*2);
     ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
 
     // ring
     ctx.globalAlpha = 0.55 + bm.flash*0.35;
-    ctx.strokeStyle = "rgba(255,255,255,.20)";
+    ctx.strokeStyle = "rgba(255,255,255,.22)";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(bm.x, bm.y, bm.r+6 + Math.sin(now/180)*2.0, 0, Math.PI*2);
@@ -1156,16 +1125,16 @@ function drawBumpers(now){
 
     // core
     const g = ctx.createRadialGradient(bm.x-6, bm.y-8, 2, bm.x, bm.y, bm.r);
-    g.addColorStop(0,"rgba(255,255,255,.55)");
-    g.addColorStop(1,"rgba(51,214,255,.08)");
+    g.addColorStop(0,"rgba(255,255,255,.60)");
+    g.addColorStop(1,"rgba(51,214,255,.10)");
     ctx.globalAlpha = 1;
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(bm.x, bm.y, bm.r, 0, Math.PI*2);
     ctx.fill();
 
-    // tiny shield icon (simple)
-    ctx.globalAlpha = 0.55 + pulse*0.25;
+    // tiny shield icon
+    ctx.globalAlpha = 0.50 + pulse*0.25;
     ctx.fillStyle = "rgba(255,255,255,.25)";
     ctx.beginPath();
     ctx.moveTo(bm.x, bm.y-bm.r*0.55);
@@ -1178,28 +1147,31 @@ function drawBumpers(now){
   }
 }
 
-function drawLauncher(){
+function drawLauncher(now){
   const L = board.launcher;
   const midX = L.x + L.w/2;
   const midY = L.y + 26;
 
-  // launcher body
+  // body
   const g = ctx.createLinearGradient(L.x, L.y, L.x, L.y+L.h);
   g.addColorStop(0,"rgba(255,255,255,.10)");
-  g.addColorStop(1,"rgba(0,0,0,.24)");
+  g.addColorStop(1,"rgba(0,0,0,.26)");
   ctx.fillStyle = g;
   roundRect(L.x, L.y, L.w, L.h, 18);
   ctx.fill();
 
-  // neon outline
-  ctx.strokeStyle = "rgba(255,216,77,.22)";
+  // border glow
+  ctx.save();
+  ctx.globalAlpha = 0.65;
+  ctx.strokeStyle = "rgba(255,216,77,.25)";
   ctx.lineWidth = 3;
   roundRect(L.x+2, L.y+2, L.w-4, L.h-4, 16);
   ctx.stroke();
+  ctx.restore();
 
-  // spring / plunger
+  // spring coil
   ctx.save();
-  ctx.globalAlpha = 0.70;
+  ctx.globalAlpha = 0.65;
   ctx.strokeStyle = "rgba(255,216,77,.45)";
   ctx.lineWidth = 2;
   const springTop = L.y + 42;
@@ -1215,7 +1187,7 @@ function drawLauncher(){
   ctx.stroke();
   ctx.restore();
 
-  // aim guide (neon)
+  // aim guide
   const aimLen = 100 + state.power*70;
   const dx = state.aimX;
   ctx.save();
@@ -1227,8 +1199,7 @@ function drawLauncher(){
   ctx.lineTo(midX + dx*aimLen*0.60, midY - aimLen);
   ctx.stroke();
 
-  // dotted guide
-  ctx.globalAlpha = 0.35;
+  ctx.globalAlpha = 0.33;
   ctx.setLineDash([6,8]);
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -1262,7 +1233,7 @@ function drawLauncher(){
 function drawHexBall(now){
   const b = state.ball;
 
-  // trail (stronger)
+  // trail
   for(let i=0;i<b.trail.length;i++){
     const p = b.trail[i];
     const age = (now - p.t);
@@ -1275,17 +1246,17 @@ function drawHexBall(now){
   }
   ctx.globalAlpha = 1;
 
-  // outer bloom
+  // bloom
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = 0.18;
+  ctx.globalAlpha = 0.16;
   ctx.fillStyle = "rgba(51,214,255,.95)";
   ctx.beginPath();
   ctx.arc(b.x, b.y, BALL_R+18, 0, Math.PI*2);
   ctx.fill();
   ctx.restore();
 
-  // core glow
+  // core
   ctx.globalAlpha = 0.35;
   ctx.fillStyle = "rgba(51,214,255,.85)";
   ctx.beginPath();
@@ -1293,7 +1264,6 @@ function drawHexBall(now){
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  // core sphere
   const g = ctx.createRadialGradient(b.x-5, b.y-6, 2, b.x, b.y, BALL_R);
   g.addColorStop(0,"rgba(255,255,255,.96)");
   g.addColorStop(1,"rgba(51,214,255,.35)");
@@ -1302,15 +1272,15 @@ function drawHexBall(now){
   ctx.arc(b.x, b.y, BALL_R, 0, Math.PI*2);
   ctx.fill();
 
-  // hex pattern (very light)
+  // subtle hex pattern
   ctx.save();
   ctx.beginPath();
   ctx.arc(b.x, b.y, BALL_R-1, 0, Math.PI*2);
   ctx.clip();
-  ctx.globalAlpha = 0.16;
+  ctx.globalAlpha = 0.14;
   ctx.strokeStyle = "rgba(255,255,255,.9)";
   ctx.lineWidth = 1;
-  const hexR = 4.2;
+  const hexR = 4.1;
   for(let yy=b.y-BALL_R; yy<=b.y+BALL_R; yy+=hexR*1.6){
     for(let xx=b.x-BALL_R; xx<=b.x+BALL_R; xx+=hexR*1.8){
       const off = ((Math.round((yy-(b.y-BALL_R))/(hexR*1.6)) % 2) ? hexR*0.9 : 0);
@@ -1336,7 +1306,7 @@ function drawHexBall(now){
   ctx.arc(b.x, b.y, BALL_R-2, 0, Math.PI*2);
   ctx.stroke();
 
-  // small direction spark
+  // small gold arc highlight
   ctx.save();
   ctx.globalAlpha = 0.55;
   ctx.strokeStyle = "rgba(255,216,77,.55)";
@@ -1413,6 +1383,7 @@ function draw(now){
   }else{
     state.shakeX = 0; state.shakeY = 0;
   }
+
   ctx.save();
   ctx.translate(state.shakeX, state.shakeY);
 
@@ -1421,7 +1392,7 @@ function draw(now){
   drawGrid();
   drawLanes(now);
   drawBumpers(now);
-  drawLauncher();
+  drawLauncher(now);
 
   if(state.phase==="aim" || state.phase==="flight" || state.phase==="feedback"){
     drawHexBall(now);
@@ -1432,9 +1403,9 @@ function draw(now){
   ctx.restore();
 }
 
-/* =========================================================
-   Game flow
-   ========================================================= */
+/* ===========================
+   Flow
+   =========================== */
 function startQuestion(){
   if(state.qIndex >= state.questions.length){
     endGame();
@@ -1447,6 +1418,7 @@ function startQuestion(){
   const q = state.questions[state.qIndex++];
   renderQuestion(q);
 
+  // READ
   state.phase = "read";
   state.readStart = performance.now();
   state.readUntil = state.readStart + READ_PAUSE_MS;
@@ -1461,6 +1433,7 @@ function startQuestion(){
     if(!state.running) return;
     if(state.phase !== "read") return;
 
+    // AIM
     readWrap.style.display = "none";
     state.phase = "aim";
     state.aimStart = performance.now();
@@ -1487,32 +1460,14 @@ function endGame(){
   document.getElementById("modalBody").innerHTML = `
     <p><b>Participant:</b> ${escapeHtml(PID)}</p>
     <p><b>Score:</b> ${state.score} &nbsp; | &nbsp; <b>Accuracy:</b> ${acc}% &nbsp; | &nbsp; <b>Attempted:</b> ${state.attempted}</p>
-    <p class="muted">Download CSV for analysis.</p>
-    <div class="row" style="justify-content:flex-start; margin-top:10px; gap:10px;">
-      <button class="btn" id="dlBtn">Download CSV</button>
-    </div>
+    <p class="muted">If you want CSV logging, tell me and I’ll add the download button back (kept off here to stay minimal).</p>
   `;
   overlay.style.display="flex";
-  setTimeout(()=> document.getElementById("dlBtn").onclick = downloadCSV, 0);
 }
 
-function downloadCSV(){
-  const rows = [["ts","pid","qid","topic","option_order","selected","intended","correct","is_correct","response_ms","score_after"]];
-  for(const r of state.log){
-    rows.push([r.ts,r.pid,r.qid,r.topic,r.option_order,r.selected,r.intended,r.correct,r.is_correct,r.response_ms,r.score_after]);
-  }
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href=url; a.download="Cyber_Pinball_Quiz_Log.csv";
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
-}
-
-/* =========================================================
+/* ===========================
    Loop
-   ========================================================= */
+   =========================== */
 function loop(now){
   if(state.running){
     if(state.phase==="read"){
@@ -1523,21 +1478,18 @@ function loop(now){
       readSecs.textContent = Math.max(0, (total - done)/1000).toFixed(1) + "s";
     }
     if(state.phase==="aim"){
-      stepAim();
+      stepAim(now);
     }else if(state.phase==="flight"){
-      stepFlight();
-      // keep bumpers flashing nice
-      for(const bm of board.bumpers) bm.flash = Math.max(0, bm.flash - 0.030);
+      stepFlight(now);
     }
   }
-
   draw(now);
   requestAnimationFrame(loop);
 }
 
-/* =========================================================
-   Boot
-   ========================================================= */
+/* ===========================
+   Boot / controls
+   =========================== */
 function boot(){
   state.running = false;
   state.phase = "menu";
@@ -1545,10 +1497,10 @@ function boot(){
   state.correct = 0;
   state.attempted = 0;
   state.qIndex = 0;
-  state.log = [];
   state.particles = [];
   state.floatPop = [];
   state.shake = 0;
+  state.log = [];
 
   state.questions = prepareQuestionsBalanced();
   qtotalEl.textContent = String(state.questions.length);
@@ -1563,23 +1515,20 @@ function boot(){
   resetBall();
   updateHUD();
 }
+
 function startGame(){
   overlay.style.display="none";
   state.running = true;
-  state.phase = "read";
   setStatus("Starting…", true);
   setTimeout(()=> startQuestion(), 450);
 }
 
-/* =========================================================
-   Wiring buttons
-   ========================================================= */
 document.getElementById("restartBtn").onclick = ()=>{ overlay.style.display="none"; boot(); };
 document.getElementById("startBtn").onclick = ()=>{ if(!state.running) startGame(); };
 
-/* =========================================================
-   Resize init
-   ========================================================= */
+/* ===========================
+   Resize
+   =========================== */
 function onResize(){
   fitCanvas();
   initBackdrop();
@@ -1588,20 +1537,12 @@ function onResize(){
 }
 window.addEventListener("resize", onResize);
 
-/* =========================================================
-   Initialize
-   ========================================================= */
+/* ===========================
+   Init
+   =========================== */
 onResize();
 boot();
 requestAnimationFrame(loop);
 </script>
 </body>
 </html>
-```
-
-If you want it even more “game-like”, tell me which direction you prefer and I’ll adjust the art style:
-
-1. **Retro 8-bit arcade**,
-2. **Modern neon cyber**,
-3. **Minimal clean UI (Apple-like)**,
-4. **Cartoon style (for younger learners)**.
