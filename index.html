@@ -388,7 +388,7 @@ function cssVar(name){
    prevents “A is often correct”
    =========================== */
 function prepareQuestionsBalanced(){
-  const selected = shuffle(QUESTION_BANK).slice(0, Math.min(10, QUESTION_BANK.length));
+  const selected = shuffle(QUESTION_BANK).slice(0, Math.min(25, QUESTION_BANK.length));
   const n = selected.length;
 
   const base = Math.floor(n/3);
